@@ -1,6 +1,7 @@
 package ca.aequilibrium.weather.adapters;
 
 import android.net.Uri;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -14,13 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.diffCallbacks.LocationDiffCallback;
+import ca.aequilibrium.weather.models.Location;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<String> mDataset;
+    private List<Location> mData;
     private FavouritesAdapterListener mListener;
 
     public interface FavouritesAdapterListener {
-        void onItemSelected(String item, int position);
+        void onItemSelected(Location location, int position);
     }
 
     // Provide a reference to the views for each data item
@@ -40,9 +43,21 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public FavouritesAdapter(List<String> data, FavouritesAdapterListener listener) {
-        mDataset = data;
+    public FavouritesAdapter(List<Location> favourites, FavouritesAdapterListener listener) {
+        mData = favourites;
         mListener = listener;
+    }
+
+    public void swapItems(List<Location> newData) {
+        // compute diffs
+        final LocationDiffCallback diffCallback = new LocationDiffCallback(mData, newData);
+        final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
+
+        // clear contacts and add
+        mData.clear();
+        mData.addAll(newData);
+
+        diffResult.dispatchUpdatesTo(this); // calls adapter's notify methods after diff is computed
     }
 
     // Create new views (invoked by the layout manager)
@@ -60,11 +75,11 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final FavouriteViewHolder favouriteViewHolder = (FavouriteViewHolder) holder;
         favouriteViewHolder.mIVWeatherIcon.setImageURI(Uri.parse("http://openweathermap.org/img/w/04n.png"));
-        favouriteViewHolder.mTVLocation.setText(mDataset.get(position));
+        favouriteViewHolder.mTVLocation.setText(mData.get(position).getName());
         favouriteViewHolder.mRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onItemSelected(mDataset.get(favouriteViewHolder.getAdapterPosition()), favouriteViewHolder.getAdapterPosition());
+                mListener.onItemSelected(mData.get(favouriteViewHolder.getAdapterPosition()), favouriteViewHolder.getAdapterPosition());
             }
         });
     }
@@ -72,6 +87,6 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mDataset.size();
+        return mData.size();
     }
 }

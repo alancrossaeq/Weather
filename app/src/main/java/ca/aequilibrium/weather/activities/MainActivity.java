@@ -17,6 +17,7 @@ import ca.aequilibrium.weather.fragments.CityFragment;
 import ca.aequilibrium.weather.fragments.HelpFragment;
 import ca.aequilibrium.weather.fragments.MapAndFavouritesFragment;
 import ca.aequilibrium.weather.fragments.SettingsFragment;
+import ca.aequilibrium.weather.models.Location;
 
 public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener {
 
@@ -145,8 +146,8 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
     }
 
     @Override
-    public void onFavouriteSelected(String favourite, int position) {
-        CityFragment cityFragment = CityFragment.newInstance(favourite, null);
+    public void onFavouriteSelected(Location favourite, int position) {
+        CityFragment cityFragment = CityFragment.newInstance(favourite);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.flContent, cityFragment).addToBackStack(null).commit();
 

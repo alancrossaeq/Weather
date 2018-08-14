@@ -19,6 +19,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import ca.aequilibrium.weather.R;
 
@@ -37,6 +38,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private MapView mMapView;
     private GoogleMap googleMap;
     private LocationManager locationManager;
+
+    private boolean movedToUser = false;
 
     private MapListener mListener;
 
@@ -156,6 +159,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public interface MapListener {
         void onMapMoved();
+        void onMarkerAdded(LatLng latLng);
     }
 
 
@@ -171,6 +175,14 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             return;
         }
         googleMap.setMyLocationEnabled(true);
+
+        googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                googleMap.addMarker(new MarkerOptions().position(latLng));
+                mListener.onMarkerAdded(latLng);
+            }
+        });
 
         Location location = getLocation();
         makeUseOfNewLocation(location);
@@ -245,7 +257,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void makeUseOfNewLocation(Location location) {
-        if (location != null) {
+        if (location != null && !movedToUser) {
 
 //            googleMap.clear();
 //            boolean moveCamera = !initialAppMapAdjustComplete || !initialMapAdjustComplete;
@@ -261,6 +273,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
                 }
             }
+            movedToUser = true;
         }
     }
 }

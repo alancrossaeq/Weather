@@ -1,6 +1,8 @@
 package ca.aequilibrium.weather.fragments;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,27 +12,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
+import com.google.android.gms.maps.model.LatLng;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.adapters.FavouritesAdapter;
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.models.Location;
+import ca.aequilibrium.weather.utils.LocationUtils;
+import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private boolean viewHidden = false;
 
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private FavouritesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
+
+    private FavouritesViewModel mFavouritesViewModel;
 
     private FavouritesListener mListener;
 
@@ -38,20 +41,9 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FavouritesFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static FavouritesFragment newInstance(String param1, String param2) {
+    public static FavouritesFragment newInstance() {
         FavouritesFragment fragment = new FavouritesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,10 +51,11 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        mFavouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
+        mFavouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
+            // Update the UI.
+            mAdapter.swapItems(favourites);
+        });
     }
 
     @Override
@@ -75,17 +68,19 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        // specify an adapter (see also next example)
-        List<String> data = new ArrayList<>();
-        data.add("string 1");
-        data.add("string 2");
-        data.add("string 3");
+        // specify an adapter
+        List<Location> data = new ArrayList<>();
+        Location location = new Location();
+        location.setName("123");
+//        data.add(location);
+//        data.add("string 2");
+//        data.add("string 3");
         mAdapter = new FavouritesAdapter(data, this);
         mRecyclerView.setAdapter(mAdapter);
 
@@ -123,17 +118,59 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
     public interface FavouritesListener {
         void onFavouritestHidden();
-        void onFavouriteSelected(String favourite, int position);
+        void onFavouriteSelected(Location favourite, int position);
     }
 
     @Override
-    public void onItemSelected(String item, int position) {
+    public void onItemSelected(Location location, int position) {
 //        CityFragment cityFragment = CityFragment.newInstance(item, null);
 //        getActivity().getSupportFragmentManager().beginTransaction()
 //                .add(cityFragment, "cityFragment")
 //                // Add this transaction to the back stack
 //                .addToBackStack(null)
 //                .commit();
-        mListener.onFavouriteSelected(item, position);
+        mListener.onFavouriteSelected(location, position);
+    }
+
+    public void addFavouriteLocation(LatLng latLng) {
+        new SaveFavouriteLocationTask(getContext(), this).execute(latLng);
+    }
+
+    private static class SaveFavouriteLocationTask extends AsyncTask<LatLng, Void, String> {
+
+//        private LatLng latLng;
+        private Context appContext;
+        private FavouritesFragment favouritesFragment;
+
+        // only retain a weak reference to the activity
+        SaveFavouriteLocationTask(Context appContextIn, FavouritesFragment favouritesFragmentIn) {
+            appContext = appContextIn;
+            favouritesFragment = favouritesFragmentIn;
+        }
+
+        @Override
+        protected String doInBackground(LatLng... params) {
+
+            LatLng latLng = params[0];
+
+            String locationName = LocationUtils.cityNameForCoordinates(appContext, latLng);
+            Location location = new Location();
+            location.setLatLng(latLng);
+            location.setName(locationName);
+            AppDatabase.getAppDatabase(appContext).locationDao().insertAll(location);
+
+            return "task finished";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (favouritesFragment != null) {
+//                favouritesFragment.mFavouritesViewModel.getFavourites(appContext).observe(favouritesFragment, favourites -> {
+////                    // Update the UI.
+////                    favouritesFragment.mAdapter.swapItems(favourites);
+////                });
+                favouritesFragment.mFavouritesViewModel.loadFavourites(appContext);
+            }
+        }
     }
 }

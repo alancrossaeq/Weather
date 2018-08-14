@@ -10,7 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.models.Location;
 
 public class MapAndFavouritesFragment extends Fragment implements FavouritesFragment.FavouritesListener, MapFragment.MapListener {
     // TODO: Rename parameter arguments, choose names that match
@@ -53,7 +56,7 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction().add(R.id.map_container, mapFragment).commit();
 
-        favouritesFragment = FavouritesFragment.newInstance(null, null);
+        favouritesFragment = FavouritesFragment.newInstance();
         fragmentManager.beginTransaction().add(R.id.favourites_container, favouritesFragment).commit();
     }
 
@@ -92,7 +95,7 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
 
     public interface MapAndFavouritesListener {
         void onFavouritesHidden();
-        void onFavouriteSelected(String favourite, int position);
+        void onFavouriteSelected(Location favourite, int position);
     }
 
     public void showFavourites() {
@@ -105,12 +108,18 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     }
 
     @Override
-    public void onFavouriteSelected(String favourite, int position) {
+    public void onFavouriteSelected(Location favourite, int position) {
         mListener.onFavouriteSelected(favourite, position);
     }
 
     @Override
     public void onMapMoved() {
         favouritesContainer.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onMarkerAdded(LatLng latLng) {
+        favouritesFragment.addFavouriteLocation(latLng);
+        showFavourites();
     }
 }

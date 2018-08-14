@@ -6,12 +6,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MapAndFavouritesFragment">
 
-    <TextView
-        android:id="@+id/text_1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/hello_blank_fragment" />
-
     <!--<TextView-->
         <!--android:id="@+id/text_2"-->
         <!--android:gravity="center"-->
@@ -23,11 +17,19 @@
         <!--android:text="@string/hello_blank_fragment" />-->
 
     <FrameLayout
-        android:id="@+id/map_content"
-        app:layout_anchorGravity="bottom"
-        app:layout_anchor="@id/text_1"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/map_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        app:layout_anchorGravity="bottom"
+        app:layout_anchor="@id/favourites_container"
+        app:layout_behavior="ca.aequilibrium.weather.ShowHideBehaviour" />
+
+    <FrameLayout
+        android:elevation="4dp"
+        android:id="@+id/favourites_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/hello_blank_fragment"
+        android:background="@color/colorPrimary"/>
 
 </android.support.design.widget.CoordinatorLayout>

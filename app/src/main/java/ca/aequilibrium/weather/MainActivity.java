@@ -15,9 +15,15 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener {
 
     private DrawerLayout mDrawerLayout;
+    private boolean favouritesHidden = false;
+    private boolean showingMap = true;
+    private MenuItem currentSelectedMenuItem;
+
+    private MapAndFavouritesFragment mapAndFavouritesFragment;
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,12 +48,19 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         setupDrawerContent(navigationView);
+        MenuItem firstItem = navigationView.getMenu().getItem(0);
+        firstItem.setChecked(true);
+        selectDrawerItem(firstItem);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        MenuItem favouritesButton = menu.findItem(R.id.action_favourites);
+        favouritesButton.setVisible(!favouritesHidden);
+
         return true;
     }
 
@@ -62,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case android.R.id.home:
                 mDrawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.action_favourites:
+                mapAndFavouritesFragment.showFavourites();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -80,26 +96,23 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectDrawerItem(MenuItem menuItem) {
         // Create a new fragment and specify the fragment to show based on nav item clicked
-        Fragment fragment = null;
-        Class fragmentClass;
+        Fragment fragment;
+        if (menuItem == currentSelectedMenuItem) {
+            return;
+        }
+        currentSelectedMenuItem = menuItem;
         switch(menuItem.getItemId()) {
             case R.id.nav_map:
-                fragmentClass = MapAndFavouritesFragment.class;
+                showingMap = true;
+                mapAndFavouritesFragment = mapAndFavouritesFragment == null ? MapAndFavouritesFragment.newInstance(null, null) : mapAndFavouritesFragment;
+                fragment = mapAndFavouritesFragment;
                 break;
             case R.id.nav_help:
-                fragmentClass = HelpFragment.class;
-                break;
-            case R.id.nav_settings:
-                fragmentClass = SettingsFragment.class;
+                fragment = HelpFragment.newInstance(null, null);
                 break;
             default:
-                fragmentClass = MapAndFavouritesFragment.class;
-        }
-
-        try {
-            fragment = (Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            e.printStackTrace();
+                fragment = SettingsFragment.newInstance(null, null);
+                break;
         }
 
         // Insert the fragment by replacing any existing fragment
@@ -112,5 +125,11 @@ public class MainActivity extends AppCompatActivity {
         setTitle(menuItem.getTitle());
         // Close the navigation drawer
         mDrawerLayout.closeDrawers();
+    }
+
+    @Override
+    public void onFavouritesHidden() {
+        favouritesHidden = true;
+        invalidateOptionsMenu();
     }
 }

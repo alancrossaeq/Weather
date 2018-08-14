@@ -2,14 +2,18 @@ package ca.aequilibrium.weather;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class MapAndFavouritesFragment extends Fragment {
+public class MapAndFavouritesFragment extends Fragment implements FavouritesFragment.FavouritesListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -19,9 +23,11 @@ public class MapAndFavouritesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    private FavouritesFragment favouritesFragment;
+    private View favouritesContainer;
     private MapFragment mapFragment;
 
-//    private OnFragmentInteractionListener mListener;
+    private MapAndFavouritesListener mListener;
 
     public MapAndFavouritesFragment() {
         // Required empty public constructor
@@ -55,15 +61,24 @@ public class MapAndFavouritesFragment extends Fragment {
 
         mapFragment = MapFragment.newInstance(null, null);
         FragmentManager fragmentManager = getChildFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.map_content, mapFragment).commit();
+        fragmentManager.beginTransaction().add(R.id.map_container, mapFragment).commit();
 
+        favouritesFragment = FavouritesFragment.newInstance(null, null);
+        fragmentManager.beginTransaction().add(R.id.favourites_container, favouritesFragment).commit();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_map_and_favourites, container, false);
+        View view = inflater.inflate(R.layout.fragment_map_and_favourites, container, false);
+
+        favouritesContainer = view.findViewById(R.id.favourites_container);
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            favouritesContainer.setElevation(((AppCompatActivity) getActivity()).getSupportActionBar().getElevation());
+        }
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -73,35 +88,36 @@ public class MapAndFavouritesFragment extends Fragment {
 //        }
 //    }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getParentFragment() instanceof MapAndFavouritesListener) {
+            mListener = (MapAndFavouritesListener) getParentFragment();
+        } else if (context instanceof MapAndFavouritesListener) {
+            mListener = (MapAndFavouritesListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MapAndFavouritesListener");
+        }
+    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+        mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-//    }
+    public interface MapAndFavouritesListener {
+        void onFavouritesHidden();
+    }
+
+    public void showFavourites() {
+//        favouritesFragment.show();
+        favouritesContainer.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onFavouritestHidden() {
+        mListener.onFavouritesHidden();
+    }
 }

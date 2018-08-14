@@ -1,28 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--tools:context=".MapAndFavouritesFragment">-->
+
+    <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+        <!--&lt;!&ndash;android:id="@+id/text_2"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_gravity="bottom"&ndash;&gt;-->
+        <!--&lt;!&ndash;app:layout_anchorGravity="bottom"&ndash;&gt;-->
+        <!--&lt;!&ndash;app:layout_anchor="@id/text_1"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:layout_height="match_parent"&ndash;&gt;-->
+        <!--&lt;!&ndash;android:text="@string/hello_blank_fragment" />&ndash;&gt;-->
+
+    <!--<FrameLayout-->
+        <!--android:id="@+id/map_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--app:layout_anchorGravity="bottom"-->
+        <!--app:layout_anchor="@id/favourites_container"-->
+        <!--app:layout_behavior="ca.aequilibrium.weather.ShowHideBehaviour" />-->
+
+    <!--<FrameLayout-->
+        <!--android:elevation="4dp"-->
+        <!--android:id="@+id/favourites_container"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="@string/hello_blank_fragment"-->
+        <!--android:background="@color/colorPrimary"/>-->
+
+<!--</android.support.design.widget.CoordinatorLayout>-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MapAndFavouritesFragment">
+    tools:context=".MapAndFavouritesFragment"
+    android:orientation="vertical">
 
     <!--<TextView-->
-        <!--android:id="@+id/text_2"-->
-        <!--android:gravity="center"-->
-        <!--android:layout_gravity="bottom"-->
-        <!--app:layout_anchorGravity="bottom"-->
-        <!--app:layout_anchor="@id/text_1"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:text="@string/hello_blank_fragment" />-->
-
-    <FrameLayout
-        android:id="@+id/map_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_anchorGravity="bottom"
-        app:layout_anchor="@id/favourites_container"
-        app:layout_behavior="ca.aequilibrium.weather.ShowHideBehaviour" />
+    <!--android:id="@+id/text_2"-->
+    <!--android:gravity="center"-->
+    <!--android:layout_gravity="bottom"-->
+    <!--app:layout_anchorGravity="bottom"-->
+    <!--app:layout_anchor="@id/text_1"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:text="@string/hello_blank_fragment" />-->
 
     <FrameLayout
         android:elevation="4dp"
@@ -32,4 +60,9 @@
         android:text="@string/hello_blank_fragment"
         android:background="@color/colorPrimary"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <FrameLayout
+        android:id="@+id/map_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+</LinearLayout>

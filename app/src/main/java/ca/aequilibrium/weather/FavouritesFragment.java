@@ -15,7 +15,7 @@ import android.view.ViewTreeObserver;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FavouritesFragment extends Fragment {
+public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -85,7 +85,7 @@ public class FavouritesFragment extends Fragment {
         data.add("string 1");
         data.add("string 2");
         data.add("string 3");
-        mAdapter = new FavouritesAdapter(data);
+        mAdapter = new FavouritesAdapter(data, this);
         mRecyclerView.setAdapter(mAdapter);
 
         mRecyclerView.setTag(mRecyclerView.getVisibility());
@@ -114,17 +114,6 @@ public class FavouritesFragment extends Fragment {
         }
     }
 
-
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//    }
-//
-//    @Override
-//    public void onAttachFragment(Fragment childFragment) {
-//        super.onAttachFragment(childFragment);
-//    }
-
     @Override
     public void onDetach() {
         super.onDetach();
@@ -133,13 +122,17 @@ public class FavouritesFragment extends Fragment {
 
     public interface FavouritesListener {
         void onFavouritestHidden();
+        void onFavouriteSelected(String favourite, int position);
     }
-//
-//    public void show() {
-//        View parentView = (View) mRecyclerView.getParent();
-//        parentView.setVisibility(View.VISIBLE);
-//        ViewGroup.LayoutParams params = mRecyclerView.getLayoutParams();
-//        params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//        parentView.setLayoutParams(params);
-//    }
+
+    @Override
+    public void onItemSelected(String item, int position) {
+//        CityFragment cityFragment = CityFragment.newInstance(item, null);
+//        getActivity().getSupportFragmentManager().beginTransaction()
+//                .add(cityFragment, "cityFragment")
+//                // Add this transaction to the back stack
+//                .addToBackStack(null)
+//                .commit();
+        mListener.onFavouriteSelected(item, position);
+    }
 }

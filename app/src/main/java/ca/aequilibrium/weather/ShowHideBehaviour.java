@@ -54,8 +54,8 @@ public class ShowHideBehaviour extends CoordinatorLayout.Behavior<View> {
 //            dependency.setVisibility(View.GONE);
 //            dependencyBarButton.setVisibility(View.INVISIBLE);
         }
-//        return super.onInterceptTouchEvent(parent, child, ev);
-        return false;
+        return super.onInterceptTouchEvent(parent, child, ev);
+//        return false;
     }
 
 //    @Override
@@ -67,8 +67,8 @@ public class ShowHideBehaviour extends CoordinatorLayout.Behavior<View> {
 //    }
 
     //    @Override
-//    public boolean onTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
-//        System.out.println("here");
-//        return super.onTouchEvent(parent, child, ev);
-//    }
+    public boolean onTouchEvent(CoordinatorLayout parent, View child, MotionEvent ev) {
+        System.out.println("here");
+        return super.onTouchEvent(parent, child, ev);
+    }
 }

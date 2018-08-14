@@ -52,7 +52,7 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        mapFragment = MapFragment.newInstance(null, null);
+        mapFragment = MapFragment.newInstance();
         FragmentManager fragmentManager = getChildFragmentManager();
         fragmentManager.beginTransaction().add(R.id.map_container, mapFragment).commit();
 

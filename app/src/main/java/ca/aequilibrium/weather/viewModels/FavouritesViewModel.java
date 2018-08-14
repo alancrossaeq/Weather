@@ -45,6 +45,9 @@ public class FavouritesViewModel extends ViewModel {
         @Override
         protected List<Location> doInBackground(Void... params) {
             List<Location> favourites = AppDatabase.getAppDatabase(appContext).locationDao().getAll();
+//            for (Location location : favourites) {
+//
+//            }
             return favourites;
         }
 

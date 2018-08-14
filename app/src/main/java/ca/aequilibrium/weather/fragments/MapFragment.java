@@ -1,9 +1,9 @@
 package ca.aequilibrium.weather.fragments;
 
 import android.Manifest;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -21,23 +21,21 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.models.Location;
+import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final int PERMISSIONS_REQUEST_LOCATIONS = 1;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
     private MapView mMapView;
     private GoogleMap googleMap;
     private LocationManager locationManager;
+    private FavouritesViewModel mFavouritesViewModel;
+    private List<Location> mFavouriteLocations;
 
     private boolean movedToUser = false;
 
@@ -47,20 +45,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MapFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static MapFragment newInstance(String param1, String param2) {
+    public static MapFragment newInstance() {
         MapFragment fragment = new MapFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,9 +55,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+        mFavouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
+        mFavouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
+            mFavouriteLocations = favourites;
+            populateFavouriteMarkers();
+        });
+    }
+
+    private void populateFavouriteMarkers() {
+        if (googleMap != null) {
+            googleMap.clear();
+            for (Location favourite : mFavouriteLocations) {
+                googleMap.addMarker(new MarkerOptions().position(favourite.getLatLng()));
+            }
         }
     }
 
@@ -115,9 +112,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
-            public void onLocationChanged(Location location) {
+            public void onLocationChanged(android.location.Location androidLocation) {
                 // Called when a new location is found by the network location provider.
-                makeUseOfNewLocation(location);
+                makeUseOfNewLocation(androidLocation);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -184,8 +181,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
-        Location location = getLocation();
-        makeUseOfNewLocation(location);
+        populateFavouriteMarkers();
+
+        android.location.Location androidLocation = getLocation();
+        makeUseOfNewLocation(androidLocation);
 //        if (location != null) {
 //
 ////            googleMap.clear();
@@ -205,16 +204,16 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 //        }
     }
 
-    public Location getLocation() {
+    public android.location.Location getLocation() {
 
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestMapPermissions();
             return null;
         }
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);// LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        android.location.Location androidLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);// LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-        return location;
+        return androidLocation;
     }
 
     public void requestMapPermissions() {
@@ -256,7 +255,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void makeUseOfNewLocation(Location location) {
+    private void makeUseOfNewLocation(android.location.Location location) {
         if (location != null && !movedToUser) {
 
 //            googleMap.clear();

@@ -1,4 +1,4 @@
-package ca.aequilibrium.weather;
+package ca.aequilibrium.weather.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -11,6 +11,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.fragments.CityFragment;
+import ca.aequilibrium.weather.fragments.HelpFragment;
+import ca.aequilibrium.weather.fragments.MapAndFavouritesFragment;
+import ca.aequilibrium.weather.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener {
 

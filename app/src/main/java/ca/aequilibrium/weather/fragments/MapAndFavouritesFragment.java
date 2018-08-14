@@ -1,4 +1,4 @@
-package ca.aequilibrium.weather;
+package ca.aequilibrium.weather.fragments;
 
 import android.content.Context;
 import android.os.Build;
@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import ca.aequilibrium.weather.R;
 
 public class MapAndFavouritesFragment extends Fragment implements FavouritesFragment.FavouritesListener, MapFragment.MapListener {
     // TODO: Rename parameter arguments, choose names that match

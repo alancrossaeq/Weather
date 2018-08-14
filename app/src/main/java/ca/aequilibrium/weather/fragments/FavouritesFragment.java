@@ -1,8 +1,6 @@
-package ca.aequilibrium.weather;
+package ca.aequilibrium.weather.fragments;
 
 import android.content.Context;
-import android.net.Uri;
-import android.opengl.Visibility;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +12,9 @@ import android.view.ViewTreeObserver;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ca.aequilibrium.weather.adapters.FavouritesAdapter;
+import ca.aequilibrium.weather.R;
 
 public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
     // TODO: Rename parameter arguments, choose names that match

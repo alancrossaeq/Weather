@@ -1,4 +1,4 @@
-package ca.aequilibrium.weather;
+package ca.aequilibrium.weather.adapters;
 
 import android.net.Uri;
 import android.support.v7.widget.CardView;
@@ -12,6 +12,8 @@ import android.widget.TextView;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
+import ca.aequilibrium.weather.R;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<String> mDataset;

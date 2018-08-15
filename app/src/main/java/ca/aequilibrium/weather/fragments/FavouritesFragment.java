@@ -94,15 +94,15 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         mAdapter = new FavouritesAdapter(data, this);
         mRecyclerView.setAdapter(mAdapter);
 
-        mRecyclerView.setTag(mRecyclerView.getVisibility());
-        mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                if (!viewHidden && mRecyclerView.getVisibility() == View.INVISIBLE || mRecyclerView.getVisibility() == View.GONE || mRecyclerView.getHeight() == 0 && mListener != null) {
-                    mListener.onFavouritestHidden();
-                }
-            }
-        });
+//        mRecyclerView.setTag(mRecyclerView.getVisibility());
+//        mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                if (!viewHidden && mRecyclerView.getVisibility() == View.INVISIBLE || mRecyclerView.getVisibility() == View.GONE || mRecyclerView.getHeight() == 0 && mListener != null) {
+//                    mListener.onFavouritestHidden();
+//                }
+//            }
+//        });
 
         return view;
     }
@@ -127,18 +127,11 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     }
 
     public interface FavouritesListener {
-        void onFavouritestHidden();
         void onFavouriteSelected(Location favourite, int position);
     }
 
     @Override
     public void onItemSelected(Location location, int position) {
-//        CityFragment cityFragment = CityFragment.newInstance(item, null);
-//        getActivity().getSupportFragmentManager().beginTransaction()
-//                .add(cityFragment, "cityFragment")
-//                // Add this transaction to the back stack
-//                .addToBackStack(null)
-//                .commit();
         mListener.onFavouriteSelected(location, position);
     }
 
@@ -148,7 +141,6 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
     private static class SaveFavouriteLocationTask extends AsyncTask<LatLng, Void, String> {
 
-//        private LatLng latLng;
         private Context appContext;
         private FavouritesFragment favouritesFragment;
 
@@ -175,10 +167,6 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         @Override
         protected void onPostExecute(String result) {
             if (favouritesFragment != null) {
-//                favouritesFragment.mFavouritesViewModel.getFavourites(appContext).observe(favouritesFragment, favourites -> {
-////                    // Update the UI.
-////                    favouritesFragment.mAdapter.swapItems(favourites);
-////                });
                 favouritesFragment.mFavouritesViewModel.loadFavourites(appContext);
             }
         }

@@ -16,18 +16,11 @@ import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.models.Location;
 
 public class MapAndFavouritesFragment extends Fragment implements FavouritesFragment.FavouritesListener, MapFragment.MapListener {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private FavouritesFragment favouritesFragment;
     private View favouritesContainer;
     private MapFragment mapFragment;
+    private boolean mFavouritesHidden = false;
 
     private MapAndFavouritesListener mListener;
 
@@ -38,8 +31,6 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     public static MapAndFavouritesFragment newInstance(String param1, String param2) {
         MapAndFavouritesFragment fragment = new MapAndFavouritesFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -47,10 +38,6 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
 
         mapFragment = MapFragment.newInstance();
         FragmentManager fragmentManager = getChildFragmentManager();
@@ -70,6 +57,8 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             favouritesContainer.setElevation(((AppCompatActivity) getActivity()).getSupportActionBar().getElevation());
         }
+
+        mFavouritesHidden = false;
 
         return view;
     }
@@ -99,12 +88,8 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     }
 
     public void showFavourites() {
+        mFavouritesHidden = false;
         favouritesContainer.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public void onFavouritestHidden() {
-        mListener.onFavouritesHidden();
     }
 
     @Override
@@ -114,7 +99,10 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
 
     @Override
     public void onMapMoved() {
-        favouritesContainer.setVisibility(View.GONE);
+        mFavouritesHidden = true;
+//        favouritesContainer.setVisibility(View.GONE);
+        favouritesContainer.setVisibility(View.INVISIBLE);
+        mListener.onFavouritesHidden();
     }
 
     @Override
@@ -126,5 +114,9 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     public void refresh() {
         mapFragment.refresh();
         favouritesFragment.refresh();
+    }
+
+    public boolean shouldShowBookmarksToolbarButton() {
+        return mFavouritesHidden;
     }
 }

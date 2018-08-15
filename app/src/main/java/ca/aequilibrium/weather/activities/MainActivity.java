@@ -22,8 +22,6 @@ import ca.aequilibrium.weather.models.Location;
 public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener, CityFragment.CityListener {
 
     private DrawerLayout mDrawerLayout;
-    private boolean favouritesHidden = false;
-    private boolean showingMap = true;
     private MenuItem currentSelectedMenuItem;
 
     private MapAndFavouritesFragment mapAndFavouritesFragment;
@@ -58,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem favouritesButton = menu.findItem(R.id.action_favourites);
-        favouritesButton.setVisible(!favouritesHidden);
+        favouritesButton.setVisible(currentFragment instanceof MapAndFavouritesFragment && mapAndFavouritesFragment.shouldShowBookmarksToolbarButton());
 
         MenuItem deleteOption = menu.findItem(R.id.action_delete);
         deleteOption.setVisible(showingCityFragment);
@@ -90,8 +88,10 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
                 return true;
             case R.id.action_favourites:
                 mapAndFavouritesFragment.showFavourites();
+                invalidateOptionsMenu();
                 return true;
         }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -125,15 +125,14 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         currentSelectedMenuItem = menuItem;
         switch(menuItem.getItemId()) {
             case R.id.nav_map:
-                showingMap = true;
                 mapAndFavouritesFragment = mapAndFavouritesFragment == null ? MapAndFavouritesFragment.newInstance(null, null) : mapAndFavouritesFragment;
-                fragment = mapAndFavouritesFragment;
+                currentFragment = fragment = mapAndFavouritesFragment;
                 break;
             case R.id.nav_help:
-                fragment = HelpFragment.newInstance();
+                currentFragment = fragment = HelpFragment.newInstance();
                 break;
             default:
-                fragment = SettingsFragment.newInstance(null, null);
+                currentFragment = fragment = SettingsFragment.newInstance(null, null);
                 break;
         }
 
@@ -147,11 +146,12 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         setTitle(menuItem.getTitle());
         // Close the navigation drawer
         mDrawerLayout.closeDrawers();
+
+        invalidateOptionsMenu();
     }
 
     @Override
     public void onFavouritesHidden() {
-        favouritesHidden = true;
         invalidateOptionsMenu();
     }
 

@@ -2,8 +2,6 @@ package ca.aequilibrium.weather.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.location.Address;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,13 +12,11 @@ import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.List;
-
-import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.adapters.FavouritesAdapter;
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.asyncTasks.SaveFavouriteLocationTask;
+import ca.aequilibrium.weather.asyncTasks.SimpleCallback;
 import ca.aequilibrium.weather.models.Location;
-import ca.aequilibrium.weather.utils.LocationUtils;
 import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
@@ -113,51 +109,12 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     }
 
     public void addFavouriteLocation(LatLng latLng) {
-        new SaveFavouriteLocationTask(getContext(), this).execute(latLng);
-    }
-
-    private static class SaveFavouriteLocationTask extends AsyncTask<LatLng, Void, String> {
-
-        private Context appContext;
-        private FavouritesFragment favouritesFragment;
-
-        // only retain a weak reference to the activity
-        SaveFavouriteLocationTask(Context appContextIn, FavouritesFragment favouritesFragmentIn) {
-            appContext = appContextIn;
-            favouritesFragment = favouritesFragmentIn;
-        }
-
-        @Override
-        protected String doInBackground(LatLng... params) {
-
-            LatLng latLng = params[0];
-
-            List<Address> addresses = LocationUtils.addressesForCoordinates(appContext, latLng);
-
-            String locality = addresses.get(0).getLocality();
-            if (locality == null || locality.isEmpty()) {
-                locality = addresses.get(0).getSubAdminArea();
+        new SaveFavouriteLocationTask(getContext(), new SimpleCallback() {
+            @Override
+            public void onFinished(Object result) {
+                favouritesViewModel.loadFavourites(getContext());
             }
-            if (locality == null || locality.isEmpty()) {
-                locality = addresses.get(0).getAdminArea();
-            }
-            String countryName = addresses.get(0).getCountryName();
-
-            Location location = new Location();
-            location.setLatLng(latLng);
-            location.setName(locality);
-            location.setCountry(countryName);
-            AppDatabase.getAppDatabase(appContext).locationDao().insertAll(location);
-
-            return "task finished";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (favouritesFragment != null) {
-                favouritesFragment.favouritesViewModel.loadFavourites(appContext);
-            }
-        }
+        }).execute(latLng);
     }
 
     public void refresh() {

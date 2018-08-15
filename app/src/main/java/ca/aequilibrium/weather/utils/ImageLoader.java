@@ -9,6 +9,7 @@ import android.util.LruCache;
 import android.widget.ImageView;
 
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 
 public class ImageLoader {
 
@@ -44,9 +45,10 @@ public class ImageLoader {
     }
 
     public void loadImageFromUrl(ImageView imageView, String url) {
+        WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
         Bitmap bitmap = getBitmapFromMemCache(url);
         if (bitmap == null) {
-            new DownloadImageTask(this, imageView).execute(url);
+            new DownloadImageTask(this, weakImageView).execute(url);
         } else {
             imageView.setImageBitmap(bitmap);
         }
@@ -63,11 +65,13 @@ public class ImageLoader {
     }
 
     private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+
         ImageLoader imageLoader;
-        ImageView imageView;
-        public DownloadImageTask(ImageLoader imageLoaderIn, ImageView imageViewIn) {
+        WeakReference<ImageView> weakImageView;
+
+        public DownloadImageTask(ImageLoader imageLoaderIn, WeakReference<ImageView> weakImageView) {
             imageLoader = imageLoaderIn;
-            imageView = imageViewIn;
+            this.weakImageView = weakImageView;
         }
 
         protected Bitmap doInBackground(String... urls) {
@@ -84,7 +88,10 @@ public class ImageLoader {
             return bmp;
         }
         protected void onPostExecute(Bitmap result) {
-            imageView.setImageBitmap(result);
+            ImageView imageView = weakImageView.get();
+            if (imageView != null) {
+                imageView.setImageBitmap(result);
+            }
         }
     }
 }

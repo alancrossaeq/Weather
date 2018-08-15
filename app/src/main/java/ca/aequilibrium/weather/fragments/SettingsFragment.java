@@ -1,9 +1,7 @@
 package ca.aequilibrium.weather.fragments;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,8 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.asyncTasks.DeleteAllFavouriteLocationsTask;
+import ca.aequilibrium.weather.asyncTasks.SimpleCallback;
 import ca.aequilibrium.weather.enums.UnitType;
 import ca.aequilibrium.weather.utils.PreferencesHelper;
 
@@ -66,7 +65,12 @@ public class SettingsFragment extends Fragment {
         builder.setMessage(R.string.reset_favourites_message)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        new DeleteFavouriteLocationsTask(getContext()).execute();
+                        new DeleteAllFavouriteLocationsTask(getContext(), new SimpleCallback() {
+                            @Override
+                            public void onFinished(Object result) {
+
+                            }
+                        }).execute();
                     }
                 })
                 .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
@@ -108,27 +112,5 @@ public class SettingsFragment extends Fragment {
                 });
 
         builder.create().show();
-    }
-
-    private static class DeleteFavouriteLocationsTask extends AsyncTask<String, Void, String> {
-
-        private Context appContext;
-
-        DeleteFavouriteLocationsTask(Context appContextIn) {
-            appContext = appContextIn;
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            AppDatabase.getAppDatabase(appContext).locationDao().deleteAll();
-
-            return "task finished";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-
-        }
     }
 }

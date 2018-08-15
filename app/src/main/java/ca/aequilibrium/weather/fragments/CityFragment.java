@@ -2,7 +2,6 @@ package ca.aequilibrium.weather.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,9 +13,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.adapters.ForecastAdapter;
+import ca.aequilibrium.weather.asyncTasks.DeleteFavouriteLocationTask;
+import ca.aequilibrium.weather.asyncTasks.SimpleCallback;
 import ca.aequilibrium.weather.enums.UnitType;
 import ca.aequilibrium.weather.models.CityView;
 import ca.aequilibrium.weather.models.Location;
@@ -141,33 +141,11 @@ public class CityFragment extends Fragment {
     }
 
     public void deleteFavourite() {
-        new DeleteFavouriteLocationTask(getContext(), listener).execute(mLocation);
-    }
-
-    private static class DeleteFavouriteLocationTask extends AsyncTask<Location, Void, String> {
-
-        private Context appContext;
-        private CityListener listener;
-
-        DeleteFavouriteLocationTask(Context appContextIn, CityListener listenerIn) {
-            appContext = appContextIn;
-            listener = listenerIn;
-        }
-
-        @Override
-        protected String doInBackground(Location... params) {
-
-            Location location = params[0];
-            AppDatabase.getAppDatabase(appContext).locationDao().delete(location);
-
-            return "task finished";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            if (listener != null) {
+        new DeleteFavouriteLocationTask(getContext(), new SimpleCallback() {
+            @Override
+            public void onFinished(Object result) {
                 listener.onFavouriteDeleted();
             }
-        }
+        }).execute(mLocation);
     }
 }

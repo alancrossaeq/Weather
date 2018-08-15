@@ -4,11 +4,11 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
-import android.os.AsyncTask;
 
 import java.util.List;
 
-import ca.aequilibrium.weather.AppDatabase;
+import ca.aequilibrium.weather.asyncTasks.GetFavouriteLocationsTask;
+import ca.aequilibrium.weather.asyncTasks.SimpleCallback;
 import ca.aequilibrium.weather.models.Location;
 
 public class FavouritesViewModel extends ViewModel {
@@ -25,29 +25,12 @@ public class FavouritesViewModel extends ViewModel {
     }
 
     public void loadFavourites(Context context) {
-        new GetFavouriteLocationsTask(context, this).execute();
-    }
-
-    private static class GetFavouriteLocationsTask extends AsyncTask<Void, Void, List<Location>> {
-
-        private Context appContext;
-        private FavouritesViewModel favouritesViewModel;
-
-        // only retain a weak reference to the activity
-        GetFavouriteLocationsTask(Context appContextIn, FavouritesViewModel favouritesViewModelIn) {
-            appContext = appContextIn;
-            favouritesViewModel = favouritesViewModelIn;
-        }
-
-        @Override
-        protected List<Location> doInBackground(Void... params) {
-            List<Location> favourites = AppDatabase.getAppDatabase(appContext).locationDao().getAll();
-            return favourites;
-        }
-
-        @Override
-        protected void onPostExecute(List<Location> favourites) {
-            favouritesViewModel.favourites.setValue(favourites);
-        }
+        new GetFavouriteLocationsTask(context, new SimpleCallback() {
+            @Override
+            public void onFinished(Object result) {
+                List<Location> resultFavourites = (List<Location>) result;
+                favourites.setValue(resultFavourites);
+            }
+        }).execute();
     }
 }

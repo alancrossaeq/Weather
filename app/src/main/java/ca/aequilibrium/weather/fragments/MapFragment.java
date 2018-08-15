@@ -25,6 +25,7 @@ import java.util.List;
 
 import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.models.Location;
+import ca.aequilibrium.weather.utils.PreferencesHelper;
 import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback {
@@ -107,7 +108,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         };
 
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestMapPermissions();
+            if (!PreferencesHelper.readLocationPermissionAlreadyRequested(context)) {
+                requestMapPermissions();
+            }
         } else {
             // Register the listener with the Location Manager to receive location updates
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
@@ -148,11 +151,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         googleMap = googleMapIn;
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestMapPermissions();
-            return;
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            googleMap.setMyLocationEnabled(true);
         }
-        googleMap.setMyLocationEnabled(true);
 
         googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
@@ -180,7 +181,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public android.location.Location getLocation() {
 
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestMapPermissions();
             return null;
         }
 
@@ -190,11 +190,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void requestMapPermissions() {
-        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            // TODO: Show an expanation to the user *asynchronously* -- don't block this thread waiting for the user's response! After the user sees the explanation, try again to request the permission.
-        } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATIONS);
-        }
+            PreferencesHelper.setLocationPermissionAlreadyRequested(context, true);
     }
 
     @Override

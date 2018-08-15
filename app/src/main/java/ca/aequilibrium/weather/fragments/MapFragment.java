@@ -9,9 +9,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.view.DragEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -42,6 +40,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private boolean movedToUser = false;
 
     private MapListener mListener;
+    private Context mContext;
 
     public MapFragment() {
         // Required empty public constructor
@@ -65,7 +64,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void populateFavouriteMarkers() {
-        if (googleMap != null) {
+        if (googleMap != null && mFavouriteLocations != null) {
             googleMap.clear();
             for (Location favourite : mFavouriteLocations) {
                 googleMap.addMarker(new MarkerOptions().position(favourite.getLatLng()));
@@ -131,6 +130,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             throw new RuntimeException(context.toString()
                     + " must implement MapListener");
         }
+        mContext = context;
     }
 
     @Override
@@ -151,8 +151,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
         googleMap = googleMapIn;
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestMapPermissions();
             return;
         }
@@ -183,7 +182,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public android.location.Location getLocation() {
 
-        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestMapPermissions();
             return null;
         }

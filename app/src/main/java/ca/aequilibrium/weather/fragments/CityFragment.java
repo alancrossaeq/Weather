@@ -1,6 +1,9 @@
 package ca.aequilibrium.weather.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.arch.persistence.room.util.StringUtil;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.Toolbar;
@@ -10,11 +13,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.R;
+import ca.aequilibrium.weather.models.City;
 import ca.aequilibrium.weather.models.CityView;
 import ca.aequilibrium.weather.models.Location;
 import ca.aequilibrium.weather.network.NetworkConstants;
 import ca.aequilibrium.weather.utils.ImageLoader;
+import ca.aequilibrium.weather.utils.StringUtils;
 import ca.aequilibrium.weather.viewModels.CityViewModel;
 import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
@@ -29,10 +35,11 @@ public class CityFragment extends Fragment {
     private TextView tvHeaderHumidity;
     private TextView tvHeaderRain;
     private TextView tvHeaderWinds;
+    private TextView tvHeaderDescription;
 
     private CityViewModel mCityViewModel;
 
-//    private OnFragmentInteractionListener mListener;
+    private CityListener mListener;
 
     public CityFragment() {
         // Required empty public constructor
@@ -59,13 +66,13 @@ public class CityFragment extends Fragment {
     }
 
     private void updateUIWithData(CityView cityView) {
-//        ivHeaderImage
         if (cityView.getForecast() != null) {
             ImageLoader.getInstance(getContext()).loadImageFromUrl(ivHeaderImage, NetworkConstants.openWeatherImgUrl + cityView.getForecast().getWeather().get(0).getIcon() + ".png");
             tvHeaderTemp.setText(cityView.getForecast().getMain().getTemp() + "°C");
             tvHeaderHumidity.setText(getString(R.string.humidity) + ": " + cityView.getForecast().getMain().getHumidity() + "%");
             tvHeaderRain.setText(getString(R.string.rainfall) + ": " + (cityView.getForecast().getRain() == null ? "0" : cityView.getForecast().getRain().getThreeHourVolume()) + "ml (3hr)");
             tvHeaderWinds.setText(getString(R.string.winds) + ": " + cityView.getForecast().getWind().getSpeed() + "mph");
+            tvHeaderDescription.setText(StringUtils.capitalizeFirstLetter(cityView.getForecast().getWeather().get(0).getDescription()));
         }
     }
 
@@ -80,6 +87,7 @@ public class CityFragment extends Fragment {
         tvHeaderHumidity = view.findViewById(R.id.tv_header_humidity);
         tvHeaderRain = view.findViewById(R.id.tv_header_rain);
         tvHeaderWinds = view.findViewById(R.id.tv_header_winds);
+        tvHeaderDescription = view.findViewById(R.id.tv_header_description);
 
         Toolbar cityToolbar = view.findViewById(R.id.city_toolbar);
         cityToolbar.setTitle(mLocation.getName());
@@ -87,25 +95,57 @@ public class CityFragment extends Fragment {
         return view;
     }
 
-//    @Override
-//    public void onAttach(Context context) {
-//        super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
-//    }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (getParentFragment() instanceof CityListener) {
+            mListener = (CityListener) getParentFragment();
+        } else if (context instanceof CityListener) {
+            mListener = (CityListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement CityListener");
+        }
+    }
 
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+        mListener = null;
     }
 
-//    public interface OnFragmentInteractionListener {
-//        // TODO: Update argument type and name
-//        void onFragmentInteraction(Uri uri);
-//    }
+    public interface CityListener {
+        void onFavouriteDeleted();
+    }
+
+    public void deleteFavourite() {
+        new DeleteFavouriteLocationTask(getContext(), mListener).execute(mLocation);
+    }
+
+    private static class DeleteFavouriteLocationTask extends AsyncTask<Location, Void, String> {
+
+        private Context appContext;
+        private CityListener listener;
+
+        DeleteFavouriteLocationTask(Context appContextIn, CityListener listenerIn) {
+            appContext = appContextIn;
+            listener = listenerIn;
+        }
+
+        @Override
+        protected String doInBackground(Location... params) {
+
+            Location location = params[0];
+            AppDatabase.getAppDatabase(appContext).locationDao().delete(location);
+
+            return "task finished";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            if (listener != null) {
+                listener.onFavouriteDeleted();
+            }
+        }
+    }
 }

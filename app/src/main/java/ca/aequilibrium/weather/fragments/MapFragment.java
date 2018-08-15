@@ -275,4 +275,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             movedToUser = true;
         }
     }
+
+    public void refresh() {
+        mFavouritesViewModel.loadFavourites(getContext());
+    }
 }

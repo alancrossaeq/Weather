@@ -59,6 +59,16 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
@@ -88,13 +98,23 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if (!viewHidden && mRecyclerView.getVisibility() == View.INVISIBLE || mRecyclerView.getVisibility() == View.GONE || mRecyclerView.getHeight() == 0) {
+                if (!viewHidden && mRecyclerView.getVisibility() == View.INVISIBLE || mRecyclerView.getVisibility() == View.GONE || mRecyclerView.getHeight() == 0 && mListener != null) {
                     mListener.onFavouritestHidden();
                 }
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
     }
 
     @Override
@@ -172,5 +192,9 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
                 favouritesFragment.mFavouritesViewModel.loadFavourites(appContext);
             }
         }
+    }
+
+    public void refresh() {
+        mFavouritesViewModel.loadFavourites(getContext());
     }
 }

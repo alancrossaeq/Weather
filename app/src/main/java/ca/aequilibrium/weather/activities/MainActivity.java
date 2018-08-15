@@ -19,7 +19,7 @@ import ca.aequilibrium.weather.fragments.MapAndFavouritesFragment;
 import ca.aequilibrium.weather.fragments.SettingsFragment;
 import ca.aequilibrium.weather.models.Location;
 
-public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener {
+public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener, CityFragment.CityListener {
 
     private DrawerLayout mDrawerLayout;
     private boolean favouritesHidden = false;
@@ -30,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
     private Fragment currentFragment;
 
     private boolean showingHamburger = false;
+    private boolean showingCityFragment = false;
+    private CityFragment cityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         MenuItem favouritesButton = menu.findItem(R.id.action_favourites);
         favouritesButton.setVisible(!favouritesHidden);
 
+        MenuItem deleteOption = menu.findItem(R.id.action_delete);
+        deleteOption.setVisible(showingCityFragment);
+
         return true;
     }
 
@@ -68,14 +73,19 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         // as you specify a parent activity in AndroidManifest.xml.
 
         switch (item.getItemId()) {
-            case R.id.action_settings:
+            case R.id.action_delete:
+                cityFragment.deleteFavourite();
                 return true;
             case android.R.id.home:
                 if (showingHamburger) {
                     mDrawerLayout.openDrawer(GravityCompat.START);
                 } else {
                     getSupportFragmentManager().popBackStack();
+                    if (showingCityFragment) {
+                        showingCityFragment = false;
+                    }
                     showHamburger();
+                    invalidateOptionsMenu();
                 }
                 return true;
             case R.id.action_favourites:
@@ -147,10 +157,21 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
 
     @Override
     public void onFavouriteSelected(Location favourite, int position) {
-        CityFragment cityFragment = CityFragment.newInstance(favourite);
+        cityFragment = CityFragment.newInstance(favourite);
         FragmentManager fragmentManager = getSupportFragmentManager();
         fragmentManager.beginTransaction().add(R.id.flContent, cityFragment).addToBackStack(null).commit();
 
         showBackButton();
+
+        showingCityFragment = true;
+        invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onFavouriteDeleted() {
+        mapAndFavouritesFragment.refresh();
+        getSupportFragmentManager().popBackStack();
+        showHamburger();
+        invalidateOptionsMenu();
     }
 }

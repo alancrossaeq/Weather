@@ -122,4 +122,9 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
         favouritesFragment.addFavouriteLocation(latLng);
         showFavourites();
     }
+
+    public void refresh() {
+        mapFragment.refresh();
+        favouritesFragment.refresh();
+    }
 }

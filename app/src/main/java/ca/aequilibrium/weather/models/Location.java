@@ -19,6 +19,9 @@ public class Location implements Parcelable {
     @ColumnInfo(name = "name")
     private String name;
 
+    @ColumnInfo(name = "country")
+    private String country;
+
     public Location() {}
 
     public int getUid() {
@@ -45,10 +48,19 @@ public class Location implements Parcelable {
         this.name = name;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
     protected Location(Parcel in) {
         uid = in.readInt();
         latLng = (LatLng) in.readValue(LatLng.class.getClassLoader());
         name = in.readString();
+        country = in.readString();
     }
 
     @Override
@@ -61,6 +73,7 @@ public class Location implements Parcelable {
         dest.writeInt(uid);
         dest.writeValue(latLng);
         dest.writeString(name);
+        dest.writeString(country);
     }
 
     @SuppressWarnings("unused")

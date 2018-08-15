@@ -156,6 +156,11 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
     }
 
     @Override
+    public void onFavouritesShown() {
+        invalidateOptionsMenu();
+    }
+
+    @Override
     public void onFavouriteSelected(Location favourite, int position) {
         cityFragment = CityFragment.newInstance(favourite);
         FragmentManager fragmentManager = getSupportFragmentManager();

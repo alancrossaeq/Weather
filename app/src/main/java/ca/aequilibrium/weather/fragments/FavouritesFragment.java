@@ -2,6 +2,7 @@ package ca.aequilibrium.weather.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.location.Address;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.util.List;
 
 import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.adapters.FavouritesAdapter;
@@ -130,10 +133,21 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
             LatLng latLng = params[0];
 
-            String locationName = LocationUtils.cityNameForCoordinates(appContext, latLng);
+            List<Address> addresses = LocationUtils.addressesForCoordinates(appContext, latLng);
+
+            String locality = addresses.get(0).getLocality();
+            if (locality == null || locality.isEmpty()) {
+                locality = addresses.get(0).getSubAdminArea();
+            }
+            if (locality == null || locality.isEmpty()) {
+                locality = addresses.get(0).getAdminArea();
+            }
+            String countryName = addresses.get(0).getCountryName();
+
             Location location = new Location();
             location.setLatLng(latLng);
-            location.setName(locationName);
+            location.setName(locality);
+            location.setCountry(countryName);
             AppDatabase.getAppDatabase(appContext).locationDao().insertAll(location);
 
             return "task finished";

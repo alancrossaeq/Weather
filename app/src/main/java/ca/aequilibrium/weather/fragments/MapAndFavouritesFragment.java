@@ -84,12 +84,14 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
 
     public interface MapAndFavouritesListener {
         void onFavouritesHidden();
+        void onFavouritesShown();
         void onFavouriteSelected(Location favourite, int position);
     }
 
     public void showFavourites() {
         mFavouritesHidden = false;
         favouritesContainer.setVisibility(View.VISIBLE);
+        mListener.onFavouritesShown();
     }
 
     @Override
@@ -100,7 +102,6 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     @Override
     public void onMapMoved() {
         mFavouritesHidden = true;
-//        favouritesContainer.setVisibility(View.GONE);
         favouritesContainer.setVisibility(View.INVISIBLE);
         mListener.onFavouritesHidden();
     }

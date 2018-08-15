@@ -22,7 +22,7 @@ public class ForecastDiffCallback extends DiffUtil.Callback {
         Forecast newEntry = mNewList.get(newItemPosition);
 
         boolean same = oldEntry.getMain().getHumidity().doubleValue() == newEntry.getMain().getHumidity().doubleValue() &&
-                ((oldEntry.getRain() == null && newEntry.getRain() == null) || (oldEntry.getRain().getThreeHourVolume().doubleValue() == newEntry.getRain().getThreeHourVolume().doubleValue())) &&
+                ((oldEntry.getRain() == null && newEntry.getRain() == null) || (oldEntry.getRain().getThreeHourVolume() == null && newEntry.getRain().getThreeHourVolume() == null) || (oldEntry.getRain().getThreeHourVolume().doubleValue() == newEntry.getRain().getThreeHourVolume().doubleValue())) &&
                 ((oldEntry.getWind()== null && newEntry.getWind() == null) || (oldEntry.getWind().getSpeed().doubleValue() == newEntry.getWind().getSpeed().doubleValue())) &&
                 oldEntry.getMain().getTemp().doubleValue() == newEntry.getMain().getTemp().doubleValue();
 

@@ -33,12 +33,14 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         // each data item is just a string in this case
         public CardView mRootView;
         public TextView mTVLocation;
-        public ImageView mIVWeatherIcon;
+        public TextView mTVCountry;
+//        public ImageView mIVWeatherIcon;
         public FavouriteViewHolder(CardView v) {
             super(v);
             mRootView = v;
-            mIVWeatherIcon = v.findViewById(R.id.iv_weather_icon);
+//            mIVWeatherIcon = v.findViewById(R.id.iv_weather_icon);
             mTVLocation = v.findViewById(R.id.tv_location);
+            mTVCountry = v.findViewById(R.id.tv_country);
         }
     }
 
@@ -77,8 +79,8 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final FavouriteViewHolder favouriteViewHolder = (FavouriteViewHolder) holder;
-        favouriteViewHolder.mIVWeatherIcon.setImageURI(Uri.parse("http://openweathermap.org/img/w/04n.png"));
         favouriteViewHolder.mTVLocation.setText(mData.get(position).getName());
+        favouriteViewHolder.mTVCountry.setText(mData.get(position).getCountry());
         favouriteViewHolder.mRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

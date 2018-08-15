@@ -108,16 +108,6 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-    }
-
-    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getParentFragment() instanceof FavouritesListener) {

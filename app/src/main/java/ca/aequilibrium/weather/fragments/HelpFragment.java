@@ -34,7 +34,8 @@ public class HelpFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_help, container, false);
 
         WebView webView = view.findViewById(R.id.webview);
-        webView.loadData(yourData, "text/html", "UTF-8");
+        webView.loadUrl("file:///android_asset/html/help.html");
+//        webView.loadData(yourData, "text/html", "UTF-8");
 
         return view;
     }

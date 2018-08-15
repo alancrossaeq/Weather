@@ -130,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
                 fragment = mapAndFavouritesFragment;
                 break;
             case R.id.nav_help:
-                fragment = HelpFragment.newInstance(null, null);
+                fragment = HelpFragment.newInstance();
                 break;
             default:
                 fragment = SettingsFragment.newInstance(null, null);

@@ -176,6 +176,7 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
     public void onFavouriteDeleted() {
         mapAndFavouritesFragment.refresh();
         getSupportFragmentManager().popBackStack();
+        showingCityFragment = false;
         showHamburger();
         invalidateOptionsMenu();
     }

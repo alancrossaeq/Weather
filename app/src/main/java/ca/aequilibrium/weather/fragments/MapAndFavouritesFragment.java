@@ -118,6 +118,6 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     }
 
     public boolean shouldShowBookmarksToolbarButton() {
-        return mFavouritesHidden;
+        return mFavouritesHidden && favouritesFragment.favouritesCount() > 0;
     }
 }

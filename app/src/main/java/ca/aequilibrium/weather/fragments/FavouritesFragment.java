@@ -25,8 +25,6 @@ import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
 
-    private boolean viewHidden = false;
-
     private RecyclerView mRecyclerView;
     private FavouritesAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
@@ -51,8 +49,12 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         super.onCreate(savedInstanceState);
         mFavouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
         mFavouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
+            boolean shouldScroll = favourites != null && favourites.size() > mAdapter.getItemCount();
             // Update the UI.
             mAdapter.swapItems(favourites);
+            if (shouldScroll) {
+                mRecyclerView.scrollToPosition(0);
+            }
         });
     }
 
@@ -163,5 +165,13 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
     public void refresh() {
         mFavouritesViewModel.loadFavourites(getContext());
+    }
+
+    public int favouritesCount() {
+        if (mAdapter != null) {
+            return mAdapter.getItemCount();
+        } else {
+            return 0;
+        }
     }
 }

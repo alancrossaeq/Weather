@@ -11,7 +11,7 @@ import ca.aequilibrium.weather.models.Location;
 
 @Dao
 public interface LocationDao {
-    @Query("SELECT * FROM location")
+    @Query("SELECT * FROM location ORDER BY uid DESC")
     List<Location> getAll();
 
     @Query("SELECT * FROM location WHERE uid IN (:locationIds)")

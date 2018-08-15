@@ -21,27 +21,27 @@ import ca.aequilibrium.weather.models.Location;
 
 public class MainActivity extends AppCompatActivity implements MapAndFavouritesFragment.MapAndFavouritesListener, CityFragment.CityListener {
 
-    private DrawerLayout mDrawerLayout;
+    private DrawerLayout drawerLayout;
     private MenuItem currentSelectedMenuItem;
 
     private MapAndFavouritesFragment mapAndFavouritesFragment;
-    private Fragment currentFragment;
+    private CityFragment cityFragment;
+    private Fragment currentNavFragment;
 
     private boolean showingHamburger = false;
     private boolean showingCityFragment = false;
-    private CityFragment cityFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
         actionbar.setDisplayHomeAsUpEnabled(true);
         showHamburger();
 
-        mDrawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         setupDrawerContent(navigationView);
@@ -52,11 +52,10 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         MenuItem favouritesButton = menu.findItem(R.id.action_favourites);
-        favouritesButton.setVisible(currentFragment instanceof MapAndFavouritesFragment && mapAndFavouritesFragment.shouldShowBookmarksToolbarButton());
+        favouritesButton.setVisible(currentNavFragment instanceof MapAndFavouritesFragment && mapAndFavouritesFragment.shouldShowBookmarksToolbarButton());
 
         MenuItem deleteOption = menu.findItem(R.id.action_delete);
         deleteOption.setVisible(showingCityFragment);
@@ -66,17 +65,13 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
         switch (item.getItemId()) {
             case R.id.action_delete:
                 cityFragment.deleteFavourite();
                 return true;
             case android.R.id.home:
                 if (showingHamburger) {
-                    mDrawerLayout.openDrawer(GravityCompat.START);
+                    drawerLayout.openDrawer(GravityCompat.START);
                 } else {
                     getSupportFragmentManager().popBackStack();
                     if (showingCityFragment) {
@@ -117,7 +112,6 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment;
         if (menuItem == currentSelectedMenuItem) {
             return;
@@ -126,13 +120,13 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         switch(menuItem.getItemId()) {
             case R.id.nav_map:
                 mapAndFavouritesFragment = mapAndFavouritesFragment == null ? MapAndFavouritesFragment.newInstance(null, null) : mapAndFavouritesFragment;
-                currentFragment = fragment = mapAndFavouritesFragment;
+                currentNavFragment = fragment = mapAndFavouritesFragment;
                 break;
             case R.id.nav_help:
-                currentFragment = fragment = HelpFragment.newInstance();
+                currentNavFragment = fragment = HelpFragment.newInstance();
                 break;
             default:
-                currentFragment = fragment = SettingsFragment.newInstance();
+                currentNavFragment = fragment = SettingsFragment.newInstance();
                 break;
         }
 
@@ -145,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
         // Set action bar title
         setTitle(menuItem.getTitle());
         // Close the navigation drawer
-        mDrawerLayout.closeDrawers();
+        drawerLayout.closeDrawers();
 
         invalidateOptionsMenu();
     }

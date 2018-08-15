@@ -3,7 +3,9 @@ package ca.aequilibrium.weather.network;
 import java.util.Map;
 
 public class NetworkRequest {
-    private String path, requestMethod, body;
+    private String path;
+    private String requestMethod;
+    private String body;
     private Map<String, String> parameters;
 
     public String getPath() {

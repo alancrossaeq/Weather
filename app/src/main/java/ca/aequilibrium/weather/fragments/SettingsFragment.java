@@ -20,7 +20,7 @@ public class SettingsFragment extends Fragment {
 
     private TextView tvResetFavourites;
     private TextView tvUnitSystem;
-    private UnitType mSelectedType;
+    private UnitType selectedUnitSystemType;
 
     public SettingsFragment() {
         // Required empty public constructor
@@ -41,7 +41,6 @@ public class SettingsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_settings, container, false);
 
         tvResetFavourites = view.findViewById(R.id.tv_reset_favourites);
@@ -80,25 +79,25 @@ public class SettingsFragment extends Fragment {
     }
 
     private void setUnitSystemTapped() {
-        mSelectedType = PreferencesHelper.readUnitSystemType(getContext());
+        selectedUnitSystemType = PreferencesHelper.readUnitSystemType(getContext());
         CharSequence[] choices = {getContext().getString(R.string.metric), getContext().getString(R.string.imperial)};
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Set the dialog title
         builder.setTitle(R.string.settings_units)
-                // Specify the list array, the items to be selected by default (null for none),
+                // Specify the list array, the item to be selected by default,
                 // and the listener through which to receive callbacks when items are selected
-                .setSingleChoiceItems(choices, mSelectedType.getValue(),
+                .setSingleChoiceItems(choices, selectedUnitSystemType.getValue(),
                         new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                mSelectedType = UnitType.valueOf(which);
+                                selectedUnitSystemType = UnitType.valueOf(which);
                             }
                         })
                 // Set the action buttons
                 .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        PreferencesHelper.setUnitSystemType(getContext(), mSelectedType);
+                        PreferencesHelper.setUnitSystemType(getContext(), selectedUnitSystemType);
                     }
                 })
                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

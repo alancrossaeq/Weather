@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,16 +31,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private static final int PERMISSIONS_REQUEST_LOCATIONS = 1;
 
-    private MapView mMapView;
+    private MapView mvMap;
+
     private GoogleMap googleMap;
     private LocationManager locationManager;
-    private FavouritesViewModel mFavouritesViewModel;
-    private List<Location> mFavouriteLocations;
-
+    private FavouritesViewModel favouritesViewModel;
+    private List<Location> favouriteLocations;
     private boolean movedToUser = false;
-
-    private MapListener mListener;
-    private Context mContext;
+    private MapListener listener;
+    private Context context;
 
     public MapFragment() {
         // Required empty public constructor
@@ -57,17 +55,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFavouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
-        mFavouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
-            mFavouriteLocations = favourites;
+        favouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
+        favouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
+            favouriteLocations = favourites;
             populateFavouriteMarkers();
         });
     }
 
     private void populateFavouriteMarkers() {
-        if (googleMap != null && mFavouriteLocations != null) {
+        if (googleMap != null && favouriteLocations != null) {
             googleMap.clear();
-            for (Location favourite : mFavouriteLocations) {
+            for (Location favourite : favouriteLocations) {
                 googleMap.addMarker(new MarkerOptions().position(favourite.getLatLng()));
             }
         }
@@ -76,13 +74,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
 
-        mMapView = (MapView) view.findViewById(R.id.mapView);
-        mMapView.onCreate(savedInstanceState);
+        mvMap = view.findViewById(R.id.mapView);
+        mvMap.onCreate(savedInstanceState);
 
-        mMapView.onResume(); // needed to get the map to display immediately
+        mvMap.onResume(); // needed to get the map to display immediately
 
         try {
             MapsInitializer.initialize(getActivity().getApplicationContext());
@@ -90,7 +87,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             e.printStackTrace();
         }
 
-        mMapView.getMapAsync(this);
+        mvMap.getMapAsync(this);
 
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -124,20 +121,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getParentFragment() instanceof MapListener) {
-            mListener = (MapListener) getParentFragment();
+            listener = (MapListener) getParentFragment();
         } else if (context instanceof MapListener) {
-            mListener = (MapListener) context;
+            listener = (MapListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement MapListener");
         }
-        mContext = context;
+        this.context = context;
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface MapListener {
@@ -148,11 +145,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(GoogleMap googleMapIn) {
-//        initialMapAdjustComplete = false;
 
         googleMap = googleMapIn;
         googleMap.getUiSettings().setMyLocationButtonEnabled(false);
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestMapPermissions();
             return;
         }
@@ -162,7 +158,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onMapClick(LatLng latLng) {
                 googleMap.addMarker(new MarkerOptions().position(latLng));
-                mListener.onMarkerAdded(latLng);
+                listener.onMarkerAdded(latLng);
             }
         });
 
@@ -170,7 +166,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             @Override
             public void onCameraMoveStarted(int reason) {
                 if (reason == REASON_GESTURE) {
-                    mListener.onMapMoved();
+                    listener.onMapMoved();
                 }
             }
         });
@@ -183,26 +179,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     public android.location.Location getLocation() {
 
-        if (ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             requestMapPermissions();
             return null;
         }
 
-        android.location.Location androidLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);// LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        android.location.Location androidLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 
         return androidLocation;
     }
 
     public void requestMapPermissions() {
-        // Should we show an explanation?
         if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            // Show an expanation to the user *asynchronously* -- don't block
-            // this thread waiting for the user's response! After the user
-            // sees the explanation, try again to request the permission.
-
+            // TODO: Show an expanation to the user *asynchronously* -- don't block this thread waiting for the user's response! After the user sees the explanation, try again to request the permission.
         } else {
-
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_LOCATIONS);
         }
     }
@@ -214,21 +204,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             case PERMISSIONS_REQUEST_LOCATIONS: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length == 1) {
-
-                    // permission was granted, yay! Do the
-                    // contacts-related task you need to do.
+                    // permission was granted, do the location related stuff!
                     onMapReady(googleMap);
                 } else {
 
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    // permission denied, boo!
 //                    requestMapPermissions();
                 }
                 return;
             }
-
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
@@ -247,6 +231,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     public void refresh() {
-        mFavouritesViewModel.loadFavourites(getContext());
+        favouritesViewModel.loadFavourites(getContext());
     }
 }

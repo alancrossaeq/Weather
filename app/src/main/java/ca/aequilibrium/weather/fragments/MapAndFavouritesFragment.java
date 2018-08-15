@@ -17,12 +17,12 @@ import ca.aequilibrium.weather.models.Location;
 
 public class MapAndFavouritesFragment extends Fragment implements FavouritesFragment.FavouritesListener, MapFragment.MapListener {
 
-    private FavouritesFragment favouritesFragment;
-    private View favouritesContainer;
-    private MapFragment mapFragment;
-    private boolean mFavouritesHidden = false;
+    private View vFavouritesContainer;
 
-    private MapAndFavouritesListener mListener;
+    private FavouritesFragment favouritesFragment;
+    private MapFragment mapFragment;
+    private MapAndFavouritesListener listener;
+    private boolean favouritesHidden = false;
 
     public MapAndFavouritesFragment() {
         // Required empty public constructor
@@ -50,15 +50,14 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map_and_favourites, container, false);
 
-        favouritesContainer = view.findViewById(R.id.favourites_container);
+        vFavouritesContainer = view.findViewById(R.id.favourites_container);
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            favouritesContainer.setElevation(((AppCompatActivity) getActivity()).getSupportActionBar().getElevation());
+            vFavouritesContainer.setElevation(((AppCompatActivity) getActivity()).getSupportActionBar().getElevation());
         }
 
-        mFavouritesHidden = false;
+        favouritesHidden = false;
 
         return view;
     }
@@ -67,9 +66,9 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getParentFragment() instanceof MapAndFavouritesListener) {
-            mListener = (MapAndFavouritesListener) getParentFragment();
+            listener = (MapAndFavouritesListener) getParentFragment();
         } else if (context instanceof MapAndFavouritesListener) {
-            mListener = (MapAndFavouritesListener) context;
+            listener = (MapAndFavouritesListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement MapAndFavouritesListener");
@@ -79,7 +78,7 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface MapAndFavouritesListener {
@@ -89,21 +88,21 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     }
 
     public void showFavourites() {
-        mFavouritesHidden = false;
-        favouritesContainer.setVisibility(View.VISIBLE);
-        mListener.onFavouritesShown();
+        favouritesHidden = false;
+        vFavouritesContainer.setVisibility(View.VISIBLE);
+        listener.onFavouritesShown();
     }
 
     @Override
     public void onFavouriteSelected(Location favourite, int position) {
-        mListener.onFavouriteSelected(favourite, position);
+        listener.onFavouriteSelected(favourite, position);
     }
 
     @Override
     public void onMapMoved() {
-        mFavouritesHidden = true;
-        favouritesContainer.setVisibility(View.INVISIBLE);
-        mListener.onFavouritesHidden();
+        favouritesHidden = true;
+        vFavouritesContainer.setVisibility(View.INVISIBLE);
+        listener.onFavouritesHidden();
     }
 
     @Override
@@ -118,6 +117,6 @@ public class MapAndFavouritesFragment extends Fragment implements FavouritesFrag
     }
 
     public boolean shouldShowBookmarksToolbarButton() {
-        return mFavouritesHidden && favouritesFragment.favouritesCount() > 0;
+        return favouritesHidden && favouritesFragment.favouritesCount() > 0;
     }
 }

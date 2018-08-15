@@ -25,13 +25,12 @@ import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class FavouritesFragment extends Fragment implements FavouritesAdapter.FavouritesAdapterListener {
 
-    private RecyclerView mRecyclerView;
-    private FavouritesAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private RecyclerView recyclerView;
+    private FavouritesAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
-    private FavouritesViewModel mFavouritesViewModel;
-
-    private FavouritesListener mListener;
+    private FavouritesViewModel favouritesViewModel;
+    private FavouritesListener listener;
 
     public FavouritesFragment() {
         // Required empty public constructor
@@ -47,13 +46,13 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mFavouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
-        mFavouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
-            boolean shouldScroll = favourites != null && favourites.size() > mAdapter.getItemCount();
+        favouritesViewModel = ViewModelProviders.of(getActivity()).get(FavouritesViewModel.class);
+        favouritesViewModel.getFavourites(getContext()).observe(this, favourites -> {
+            boolean shouldScroll = favourites != null && favourites.size() > adapter.getItemCount();
             // Update the UI.
-            mAdapter.swapItems(favourites);
+            adapter.swapItems(favourites);
             if (shouldScroll) {
-                mRecyclerView.scrollToPosition(0);
+                recyclerView.scrollToPosition(0);
             }
         });
     }
@@ -71,18 +70,16 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_favourites, container, false);
 
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_favourites);
+        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_favourites);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        // use a horizontal layout manager
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
 
-        // specify an adapter
-        mAdapter = new FavouritesAdapter(null, this);
-        mRecyclerView.setAdapter(mAdapter);
+        adapter = new FavouritesAdapter(null, this);
+        recyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -91,9 +88,9 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getParentFragment() instanceof FavouritesListener) {
-            mListener = (FavouritesListener) getParentFragment();
+            listener = (FavouritesListener) getParentFragment();
         } else if (context instanceof FavouritesListener) {
-            mListener = (FavouritesListener) context;
+            listener = (FavouritesListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement FavouritesListener");
@@ -103,7 +100,7 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface FavouritesListener {
@@ -112,7 +109,7 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
     @Override
     public void onItemSelected(Location location, int position) {
-        mListener.onFavouriteSelected(location, position);
+        listener.onFavouriteSelected(location, position);
     }
 
     public void addFavouriteLocation(LatLng latLng) {
@@ -158,18 +155,18 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
         @Override
         protected void onPostExecute(String result) {
             if (favouritesFragment != null) {
-                favouritesFragment.mFavouritesViewModel.loadFavourites(appContext);
+                favouritesFragment.favouritesViewModel.loadFavourites(appContext);
             }
         }
     }
 
     public void refresh() {
-        mFavouritesViewModel.loadFavourites(getContext());
+        favouritesViewModel.loadFavourites(getContext());
     }
 
     public int favouritesCount() {
-        if (mAdapter != null) {
-            return mAdapter.getItemCount();
+        if (adapter != null) {
+            return adapter.getItemCount();
         } else {
             return 0;
         }

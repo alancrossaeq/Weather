@@ -9,18 +9,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.net.ssl.HttpsURLConnection;
-
 import ca.aequilibrium.weather.BuildConfig;
 import ca.aequilibrium.weather.enums.UnitType;
-import ca.aequilibrium.weather.models.Forecast;
 import ca.aequilibrium.weather.models.Location;
 import ca.aequilibrium.weather.utils.NetworkUtils;
 
@@ -51,27 +45,6 @@ public class RequestSender {
     }
 
     public void performRequestInBackground(String path, Map<String, String> parameters, String requestMethod, String body, RequestSenderCallback callback) {
-//        Request request = new DefaultRequest(SERVICE_NAME);
-////        request.setResourcePath(path);
-////        if (parameters != null) {
-////            request.setParameters(parameters);
-////        }
-////        request.setEndpoint(mEndpointURI);
-////        request.setHttpMethod(requestType);
-////
-////        if (body != null) {
-////            byte[] content = body.getBytes(UTF8);
-////            try {
-////                request.setContent(new StringInputStream(body));
-////            } catch (Exception e) {
-////                Log.e(TAG, e.getMessage());
-////            }
-////            request.addHeader("Content-Length", Integer.toString(content.length));
-////        }
-////
-////        request.addHeader("Content-Type", "application/json; charset=UTF-8");
-////        request.addHeader("Accept", "application/json");
-
         NetworkRequest networkRequest = new NetworkRequest();
         networkRequest.setParameters(parameters);
         networkRequest.setPath(path);
@@ -94,18 +67,8 @@ public class RequestSender {
             NetworkRequest request = params[0];
 
             if (request.getParameters() == null) {
-                request.setParameters(new HashMap<String, String>());
+                request.setParameters(new HashMap<>());
             }
-
-//            try {
-//                URL url = new URL(request.getPath());
-//
-//                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//                conn.setRequestMethod(request.getRequestMethod());
-//
-//            } catch (Exception e) {
-//
-//            }
 
             URL url;
             String response = "";
@@ -157,13 +120,6 @@ public class RequestSender {
         @Override
         protected void onPostExecute(Pair<String, String> response) {
             super.onPostExecute(response);
-//            if (this.mCallback != null) {
-//                if (response != null) {
-//                    this.mCallback.parseData(mGson, response.first, response.second);
-//                } else {
-//                    this.mCallback.onFailure(new Exception("Error occurred when trying to complete the request."));
-//                }
-//            }
             this.mCallback.onResponse(response.first, response.second);
         }
     }

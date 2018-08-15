@@ -1,16 +1,13 @@
 package ca.aequilibrium.weather.adapters;
 
-import android.net.Uri;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,73 +16,69 @@ import ca.aequilibrium.weather.diffCallbacks.LocationDiffCallback;
 import ca.aequilibrium.weather.models.Location;
 
 public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Location> mData;
-    private FavouritesAdapterListener mListener;
+
+    private List<Location> items;
+    private FavouritesAdapterListener listener;
 
     public interface FavouritesAdapterListener {
         void onItemSelected(Location location, int position);
     }
 
     public static class FavouriteViewHolder extends RecyclerView.ViewHolder {
-        // each data item is just a string in this case
-        public CardView mRootView;
-        public TextView mTVLocation;
-        public TextView mTVCountry;
+        public CardView cvRootView;
+        public TextView tvLocation;
+        public TextView tvCountry;
         public FavouriteViewHolder(CardView v) {
             super(v);
-            mRootView = v;
-            mTVLocation = v.findViewById(R.id.tv_location);
-            mTVCountry = v.findViewById(R.id.tv_country);
+            cvRootView = v;
+            tvLocation = v.findViewById(R.id.tv_location);
+            tvCountry = v.findViewById(R.id.tv_country);
         }
     }
 
-    public FavouritesAdapter(List<Location> favourites, FavouritesAdapterListener listener) {
-        mData = favourites == null ? new ArrayList<>() : favourites;
-        mListener = listener;
+    public FavouritesAdapter(List<Location> items, FavouritesAdapterListener listener) {
+        this.items = items == null ? new ArrayList<>() : items;
+        this.listener = listener;
     }
 
-    public void swapItems(List<Location> newData) {
+    public void swapItems(List<Location> newItems) {
 
-        newData = newData == null ? new ArrayList<>() : newData;
+        newItems = newItems == null ? new ArrayList<>() : newItems;
 
         // compute diffs
-        final LocationDiffCallback diffCallback = new LocationDiffCallback(mData, newData);
+        final LocationDiffCallback diffCallback = new LocationDiffCallback(items, newItems);
         final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
 
         // clear contacts and add
-        mData.clear();
-        mData.addAll(newData);
+        items.clear();
+        items.addAll(newItems);
 
         diffResult.dispatchUpdatesTo(this); // calls adapter's notify methods after diff is computed
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         CardView v = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_favourite, parent, false);
 
         FavouriteViewHolder vh = new FavouriteViewHolder(v);
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final FavouriteViewHolder favouriteViewHolder = (FavouriteViewHolder) holder;
-        favouriteViewHolder.mTVLocation.setText(mData.get(position).getName());
-        favouriteViewHolder.mTVCountry.setText(mData.get(position).getCountry());
-        favouriteViewHolder.mRootView.setOnClickListener(new View.OnClickListener() {
+        favouriteViewHolder.tvLocation.setText(items.get(position).getName());
+        favouriteViewHolder.tvCountry.setText(items.get(position).getCountry());
+        favouriteViewHolder.cvRootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.onItemSelected(mData.get(favouriteViewHolder.getAdapterPosition()), favouriteViewHolder.getAdapterPosition());
+                listener.onItemSelected(items.get(favouriteViewHolder.getAdapterPosition()), favouriteViewHolder.getAdapterPosition());
             }
         });
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mData.size();
+        return items.size();
     }
 }

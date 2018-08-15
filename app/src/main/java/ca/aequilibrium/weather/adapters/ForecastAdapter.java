@@ -21,11 +21,12 @@ import ca.aequilibrium.weather.utils.ImageLoader;
 import ca.aequilibrium.weather.utils.PreferencesHelper;
 
 public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private List<Forecast> mData;
+
+    private List<Forecast> items;
     private Context context;
 
     public static class ForecastViewHolder extends RecyclerView.ViewHolder {
-        public CardView mRootView;
+        public CardView cvRootView;
         private TextView tvTemp;
         private TextView tvHumidity;
         private TextView tvRain;
@@ -34,7 +35,7 @@ public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
         public ImageView ivWeatherIcon;
         public ForecastViewHolder(CardView v) {
             super(v);
-            mRootView = v;
+            cvRootView = v;
             ivWeatherIcon = v.findViewById(R.id.iv_weather_icon);
             tvTemp = v.findViewById(R.id.tv_temp);
             tvHumidity = v.findViewById(R.id.tv_humidity);
@@ -44,36 +45,33 @@ public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
     }
 
-    public ForecastAdapter(Context context, List<Forecast> favourites) {
+    public ForecastAdapter(Context context, List<Forecast> newItems) {
         this.context = context;
-        mData = favourites == null ? new ArrayList<>() : favourites;
+        items = newItems == null ? new ArrayList<>() : newItems;
     }
 
-    public void swapItems(List<Forecast> newData) {
-        newData = newData == null ? new ArrayList<>() : newData;
+    public void swapItems(List<Forecast> newItems) {
+        newItems = newItems == null ? new ArrayList<>() : newItems;
 
         // compute diffs
-        final ForecastDiffCallback diffCallback = new ForecastDiffCallback(mData, newData);
+        final ForecastDiffCallback diffCallback = new ForecastDiffCallback(items, newItems);
         final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);
 
         // clear contacts and add
-        mData.clear();
-        mData.addAll(newData);
+        items.clear();
+        items.addAll(newItems);
 
         diffResult.dispatchUpdatesTo(this); // calls adapter's notify methods after diff is computed
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        // create a new view
         CardView v = (CardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.item_forecast, parent, false);
 
         ForecastViewHolder vh = new ForecastViewHolder(v);
         return vh;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         UnitType unitType = PreferencesHelper.readUnitSystemType(context);
@@ -82,7 +80,7 @@ public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
         String volumeMetric = unitType == UnitType.METRIC ? context.getString(R.string.unit_ml) : context.getString(R.string.unit_ounces);
 
         final ForecastViewHolder forecastViewHolder = (ForecastViewHolder) holder;
-        Forecast forecast = mData.get(position);
+        Forecast forecast = items.get(position);
         ImageLoader.getInstance(context).loadImageFromUrl(forecastViewHolder.ivWeatherIcon, NetworkConstants.openWeatherImgUrl + forecast.getWeather().get(0).getIcon() + ".png");
         forecastViewHolder.tvTemp.setText(forecast.getMain().getTemp() + tempMetric);
         forecastViewHolder.tvHumidity.setText(context.getString(R.string.humidity) + ": " + forecast.getMain().getHumidity() + "%");
@@ -91,9 +89,8 @@ public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
         forecastViewHolder.tvDate.setText(forecast.getDt_txt() + " UTC");
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return mData.size();
+        return items.size();
     }
 }

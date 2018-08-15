@@ -39,13 +39,12 @@ public class CityFragment extends Fragment {
     private TextView tvHeaderWinds;
     private TextView tvHeaderDescription;
 
-    private CityViewModel mCityViewModel;
+    private RecyclerView recyclerView;
+    private ForecastAdapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
-    private CityListener mListener;
-
-    private RecyclerView mRecyclerView;
-    private ForecastAdapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
+    private CityViewModel cityViewModel;
+    private CityListener listener;
 
     public CityFragment() {
         // Required empty public constructor
@@ -65,8 +64,8 @@ public class CityFragment extends Fragment {
         if (getArguments() != null) {
             mLocation = getArguments().getParcelable(ARG_PARAM1);
         }
-        mCityViewModel = ViewModelProviders.of(getActivity()).get(CityViewModel.class);
-        mCityViewModel.getCityView(getContext(), mLocation).observe(this, cityView -> {
+        cityViewModel = ViewModelProviders.of(getActivity()).get(CityViewModel.class);
+        cityViewModel.getCityView(getContext(), mLocation).observe(this, cityView -> {
             updateUIWithData(cityView);
         });
     }
@@ -87,14 +86,13 @@ public class CityFragment extends Fragment {
         }
 
         if (cityView.getFiveDayForecast() != null) {
-            mAdapter.swapItems(cityView.getFiveDayForecast().getList());
+            adapter.swapItems(cityView.getFiveDayForecast().getList());
         }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_city, container, false);
 
         ivHeaderImage = view.findViewById(R.id.iv_header_image);
@@ -107,16 +105,14 @@ public class CityFragment extends Fragment {
         Toolbar cityToolbar = view.findViewById(R.id.city_toolbar);
         cityToolbar.setTitle(mLocation.getName());
 
-        mRecyclerView = view.findViewById(R.id.recycler_view_fivedayforecast);
-        mRecyclerView.setHasFixedSize(true);
+        recyclerView = view.findViewById(R.id.recycler_view_fivedayforecast);
+        recyclerView.setHasFixedSize(true);
 
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        layoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(layoutManager);
 
-        // specify an adapter
-        mAdapter = new ForecastAdapter(getActivity(),null);
-        mRecyclerView.setAdapter(mAdapter);
+        adapter = new ForecastAdapter(getActivity(),null);
+        recyclerView.setAdapter(adapter);
 
         return view;
     }
@@ -125,9 +121,9 @@ public class CityFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         if (getParentFragment() instanceof CityListener) {
-            mListener = (CityListener) getParentFragment();
+            listener = (CityListener) getParentFragment();
         } else if (context instanceof CityListener) {
-            mListener = (CityListener) context;
+            listener = (CityListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement CityListener");
@@ -137,7 +133,7 @@ public class CityFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface CityListener {
@@ -145,7 +141,7 @@ public class CityFragment extends Fragment {
     }
 
     public void deleteFavourite() {
-        new DeleteFavouriteLocationTask(getContext(), mListener).execute(mLocation);
+        new DeleteFavouriteLocationTask(getContext(), listener).execute(mLocation);
     }
 
     private static class DeleteFavouriteLocationTask extends AsyncTask<Location, Void, String> {

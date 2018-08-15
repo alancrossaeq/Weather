@@ -13,6 +13,8 @@ import android.widget.TextView;
 import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.models.CityView;
 import ca.aequilibrium.weather.models.Location;
+import ca.aequilibrium.weather.network.NetworkConstants;
+import ca.aequilibrium.weather.utils.ImageLoader;
 import ca.aequilibrium.weather.viewModels.CityViewModel;
 import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
@@ -59,6 +61,7 @@ public class CityFragment extends Fragment {
     private void updateUIWithData(CityView cityView) {
 //        ivHeaderImage
         if (cityView.getForecast() != null) {
+            ImageLoader.getInstance(getContext()).loadImageFromUrl(ivHeaderImage, NetworkConstants.openWeatherImgUrl + cityView.getForecast().getWeather().get(0).getIcon() + ".png");
             tvHeaderTemp.setText(cityView.getForecast().getMain().getTemp() + "°C");
             tvHeaderHumidity.setText(getString(R.string.humidity) + ": " + cityView.getForecast().getMain().getHumidity() + "%");
             tvHeaderRain.setText(getString(R.string.rainfall) + ": " + (cityView.getForecast().getRain() == null ? "0" : cityView.getForecast().getRain().getThreeHourVolume()) + "ml (3hr)");

@@ -31,7 +31,7 @@ public class RequestSender {
         params.put("lon", String.valueOf(location.getLatLng().longitude));
         params.put("units", "metric");
         params.put("appid", BuildConfig.WEATHER_API_ID);
-        performRequestInBackground(NetworkConstants.openWeatherBaseUrl + NetworkConstants.openWeatherCurrentForecastPath,
+        performRequestInBackground(NetworkConstants.openWeatherApiUrl + NetworkConstants.openWeatherCurrentForecastPath,
                 params, "GET", null, callback);
     }
 
@@ -41,7 +41,7 @@ public class RequestSender {
         params.put("lon", String.valueOf(location.getLatLng().longitude));
         params.put("units", "metric");
         params.put("appid", BuildConfig.WEATHER_API_ID);
-        performRequestInBackground(NetworkConstants.openWeatherBaseUrl + NetworkConstants.openWeatherFiveDayForecastPath,
+        performRequestInBackground(NetworkConstants.openWeatherApiUrl + NetworkConstants.openWeatherFiveDayForecastPath,
                 params, "GET", null, callback);
     }
 

@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements MapAndFavouritesF
                 currentFragment = fragment = HelpFragment.newInstance();
                 break;
             default:
-                currentFragment = fragment = SettingsFragment.newInstance(null, null);
+                currentFragment = fragment = SettingsFragment.newInstance();
                 break;
         }
 

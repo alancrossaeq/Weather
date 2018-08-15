@@ -26,25 +26,19 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         void onItemSelected(Location location, int position);
     }
 
-    // Provide a reference to the views for each data item
-    // Complex data items may need more than one view per item, and
-    // you provide access to all the views for a data item in a view holder
     public static class FavouriteViewHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         public CardView mRootView;
         public TextView mTVLocation;
         public TextView mTVCountry;
-//        public ImageView mIVWeatherIcon;
         public FavouriteViewHolder(CardView v) {
             super(v);
             mRootView = v;
-//            mIVWeatherIcon = v.findViewById(R.id.iv_weather_icon);
             mTVLocation = v.findViewById(R.id.tv_location);
             mTVCountry = v.findViewById(R.id.tv_country);
         }
     }
 
-    // Provide a suitable constructor (depends on the kind of dataset)
     public FavouritesAdapter(List<Location> favourites, FavouritesAdapterListener listener) {
         mData = favourites == null ? new ArrayList<>() : favourites;
         mListener = listener;

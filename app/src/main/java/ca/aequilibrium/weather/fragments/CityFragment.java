@@ -17,10 +17,12 @@ import android.widget.TextView;
 import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.adapters.ForecastAdapter;
+import ca.aequilibrium.weather.enums.UnitType;
 import ca.aequilibrium.weather.models.CityView;
 import ca.aequilibrium.weather.models.Location;
 import ca.aequilibrium.weather.network.NetworkConstants;
 import ca.aequilibrium.weather.utils.ImageLoader;
+import ca.aequilibrium.weather.utils.PreferencesHelper;
 import ca.aequilibrium.weather.utils.StringUtils;
 import ca.aequilibrium.weather.viewModels.CityViewModel;
 
@@ -70,12 +72,17 @@ public class CityFragment extends Fragment {
     }
 
     private void updateUIWithData(CityView cityView) {
+        UnitType unitType = PreferencesHelper.readUnitSystemType(getContext());
+        String speedMetric = unitType == UnitType.METRIC ? getString(R.string.unit_kph) : getString(R.string.unit_mph);
+        String tempMetric = unitType == UnitType.METRIC ? getString(R.string.unit_celsius) : getString(R.string.unit_fahrenheit);
+        String volumeMetric = unitType == UnitType.METRIC ? getString(R.string.unit_ml) : getString(R.string.unit_ounces);
+
         if (cityView.getForecast() != null) {
             ImageLoader.getInstance(getContext()).loadImageFromUrl(ivHeaderImage, NetworkConstants.openWeatherImgUrl + cityView.getForecast().getWeather().get(0).getIcon() + ".png");
-            tvHeaderTemp.setText(cityView.getForecast().getMain().getTemp() + "°C");
+            tvHeaderTemp.setText(cityView.getForecast().getMain().getTemp() + tempMetric);
             tvHeaderHumidity.setText(getString(R.string.humidity) + ": " + cityView.getForecast().getMain().getHumidity() + "%");
-            tvHeaderRain.setText(getString(R.string.rainfall) + ": " + (cityView.getForecast().getRain() == null ? "0" : cityView.getForecast().getRain().getThreeHourVolume()) + "ml (3hr)");
-            tvHeaderWinds.setText(getString(R.string.winds) + ": " + cityView.getForecast().getWind().getSpeed() + "mph");
+            tvHeaderRain.setText(getString(R.string.rainfall) + ": " + ((cityView.getForecast().getRain() == null || cityView.getForecast().getRain().getThreeHourVolume() == null) ? "0" : cityView.getForecast().getRain().getThreeHourVolume()) + volumeMetric + " (3hr)");
+            tvHeaderWinds.setText(getString(R.string.winds) + ": " + cityView.getForecast().getWind().getSpeed() + speedMetric);
             tvHeaderDescription.setText(StringUtils.capitalizeFirstLetter(cityView.getForecast().getWeather().get(0).getDescription()));
         }
 

@@ -14,9 +14,11 @@ import java.util.List;
 
 import ca.aequilibrium.weather.R;
 import ca.aequilibrium.weather.diffCallbacks.ForecastDiffCallback;
+import ca.aequilibrium.weather.enums.UnitType;
 import ca.aequilibrium.weather.models.Forecast;
 import ca.aequilibrium.weather.network.NetworkConstants;
 import ca.aequilibrium.weather.utils.ImageLoader;
+import ca.aequilibrium.weather.utils.PreferencesHelper;
 
 public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private List<Forecast> mData;
@@ -74,13 +76,18 @@ public class ForecastAdapter  extends RecyclerView.Adapter<RecyclerView.ViewHold
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        UnitType unitType = PreferencesHelper.readUnitSystemType(context);
+        String speedMetric = unitType == UnitType.METRIC ? context.getString(R.string.unit_kph) : context.getString(R.string.unit_mph);
+        String tempMetric = unitType == UnitType.METRIC ? context.getString(R.string.unit_celsius) : context.getString(R.string.unit_fahrenheit);
+        String volumeMetric = unitType == UnitType.METRIC ? context.getString(R.string.unit_ml) : context.getString(R.string.unit_ounces);
+
         final ForecastViewHolder forecastViewHolder = (ForecastViewHolder) holder;
         Forecast forecast = mData.get(position);
         ImageLoader.getInstance(context).loadImageFromUrl(forecastViewHolder.ivWeatherIcon, NetworkConstants.openWeatherImgUrl + forecast.getWeather().get(0).getIcon() + ".png");
-        forecastViewHolder.tvTemp.setText(forecast.getMain().getTemp() + "°C");
+        forecastViewHolder.tvTemp.setText(forecast.getMain().getTemp() + tempMetric);
         forecastViewHolder.tvHumidity.setText(context.getString(R.string.humidity) + ": " + forecast.getMain().getHumidity() + "%");
-        forecastViewHolder.tvRain.setText(context.getString(R.string.rainfall) + ": " + (forecast.getRain() == null ? "0" : forecast.getRain().getThreeHourVolume()) + "ml (3hr)");
-        forecastViewHolder.tvWinds.setText(context.getString(R.string.winds) + ": " + forecast.getWind().getSpeed() + "mph");
+        forecastViewHolder.tvRain.setText(context.getString(R.string.rainfall) + ": " + ((forecast.getRain() == null || forecast.getRain().getThreeHourVolume() == null) ? "0" : forecast.getRain().getThreeHourVolume()) + volumeMetric + " (3hr)");
+        forecastViewHolder.tvWinds.setText(context.getString(R.string.winds) + ": " + forecast.getWind().getSpeed() + speedMetric);
         forecastViewHolder.tvDate.setText(forecast.getDt_txt() + " UTC");
     }
 

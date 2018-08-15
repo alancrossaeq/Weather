@@ -19,27 +19,28 @@ import java.util.Map;
 import javax.net.ssl.HttpsURLConnection;
 
 import ca.aequilibrium.weather.BuildConfig;
+import ca.aequilibrium.weather.enums.UnitType;
 import ca.aequilibrium.weather.models.Forecast;
 import ca.aequilibrium.weather.models.Location;
 import ca.aequilibrium.weather.utils.NetworkUtils;
 
 public class RequestSender {
 
-    public void getForecast(Location location, RequestSenderCallback callback) {
+    public void getForecast(Location location, UnitType unitType, RequestSenderCallback callback) {
         Map<String, String> params = new HashMap<>();
         params.put("lat", String.valueOf(location.getLatLng().latitude));
         params.put("lon", String.valueOf(location.getLatLng().longitude));
-        params.put("units", "metric");
+        params.put("units", unitType == UnitType.METRIC ? "metric" : "imperial");
         params.put("appid", BuildConfig.WEATHER_API_ID);
         performRequestInBackground(NetworkConstants.openWeatherApiUrl + NetworkConstants.openWeatherCurrentForecastPath,
                 params, "GET", null, callback);
     }
 
-    public void getFiveDayForecast(Location location, RequestSenderCallback callback) {
+    public void getFiveDayForecast(Location location, UnitType unitType, RequestSenderCallback callback) {
         Map<String, String> params = new HashMap<>();
         params.put("lat", String.valueOf(location.getLatLng().latitude));
         params.put("lon", String.valueOf(location.getLatLng().longitude));
-        params.put("units", "metric");
+        params.put("units", unitType == UnitType.METRIC ? "metric" : "imperial");
         params.put("appid", BuildConfig.WEATHER_API_ID);
         performRequestInBackground(NetworkConstants.openWeatherApiUrl + NetworkConstants.openWeatherFiveDayForecastPath,
                 params, "GET", null, callback);

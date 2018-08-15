@@ -10,6 +10,25 @@
     <string name="rainfall">Rainfall</string>
     <string name="winds">Winds</string>
 
+    <string name="settings_reset_favourites">Reset Favourites</string>
+    <string name="reset_favourites_message">Reset Favourites?</string>
+    <string name="settings_units">Unit System</string>
+
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="unit_kph">kp/h</string>
+    <string name="unit_mph">mph</string>
+    <string name="unit_ml">ml</string>
+    <string name="unit_ounces">ounce(s)</string>
+    <string name="unit_celsius">°C</string>
+    <string name="unit_fahrenheit">°F</string>
+
+    <string name="metric">Metric</string>
+    <string name="imperial">Imperial</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

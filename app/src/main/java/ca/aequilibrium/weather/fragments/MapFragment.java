@@ -9,7 +9,9 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -89,23 +91,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         mMapView.getMapAsync(this);
-//        mMapView.getMapAsync(new OnMapReadyCallback() {
-//            @Override
-//            public void onMapReady(GoogleMap mMap) {
-//                googleMap = mMap;
-//
-//                // For showing a move to my location button
-//                googleMap.setMyLocationEnabled(true);
-//
-//                // For dropping a marker at a point on the Map
-//                LatLng sydney = new LatLng(-34, 151);
-//                googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker Title").snippet("Marker Description"));
-//
-//                // For zooming automatically to the location of the marker
-//                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(12).build();
-//                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-//            }
-//        });
 
         // Acquire a reference to the system Location Manager
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -181,27 +166,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        googleMap.setOnCameraMoveStartedListener(new GoogleMap.OnCameraMoveStartedListener() {
+            @Override
+            public void onCameraMoveStarted(int reason) {
+                if (reason == REASON_GESTURE) {
+                    mListener.onMapMoved();
+                }
+            }
+        });
+
         populateFavouriteMarkers();
 
         android.location.Location androidLocation = getLocation();
         makeUseOfNewLocation(androidLocation);
-//        if (location != null) {
-//
-////            googleMap.clear();
-////            boolean moveCamera = !initialAppMapAdjustComplete || !initialMapAdjustComplete;
-////            placeUserMarker(loggedInUser, moveCamera, true, true);
-////            initialAppMapAdjustComplete = true;
-////            initialMapAdjustComplete = true;
-//
-//            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-//            if (true) {
-//                if (true) {
-//                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-//                } else {
-//                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 10));
-//                }
-//            }
-//        }
     }
 
     public android.location.Location getLocation() {
@@ -257,13 +234,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
 
     private void makeUseOfNewLocation(android.location.Location location) {
         if (location != null && !movedToUser) {
-
-//            googleMap.clear();
-//            boolean moveCamera = !initialAppMapAdjustComplete || !initialMapAdjustComplete;
-//            placeUserMarker(loggedInUser, moveCamera, true, true);
-//            initialAppMapAdjustComplete = true;
-//            initialMapAdjustComplete = true;
-
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             if (true) {
                 if (true) {

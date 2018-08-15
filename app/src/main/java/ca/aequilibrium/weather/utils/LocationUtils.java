@@ -14,10 +14,14 @@ public class LocationUtils {
         try {
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
             List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            String cityName = addresses.get(0).getAddressLine(0);
+            String locality = addresses.get(0).getLocality();
+            if (locality == null || locality.isEmpty()) {
+                locality = addresses.get(0).getSubAdminArea();
+            }
+//            String cityName = addresses.get(0).getAddressLine(0);
 //            String stateName = addresses.get(0).getAddressLine(1);
 //            String countryName = addresses.get(0).getAddressLine(2);
-            return cityName;
+            return locality;
         } catch (Exception e) {
             return null;
         }

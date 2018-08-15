@@ -1,5 +1,7 @@
 package ca.aequilibrium.weather.utils;
 
+import ca.aequilibrium.weather.models.Forecast;
+
 public class StringUtils {
     public static String capitalizeFirstLetter(String original) {
         if (original == null || original.length() == 0) {

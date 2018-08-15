@@ -1,11 +1,12 @@
 package ca.aequilibrium.weather.fragments;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.arch.persistence.room.util.StringUtil;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,14 +16,13 @@ import android.widget.TextView;
 
 import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.R;
-import ca.aequilibrium.weather.models.City;
+import ca.aequilibrium.weather.adapters.ForecastAdapter;
 import ca.aequilibrium.weather.models.CityView;
 import ca.aequilibrium.weather.models.Location;
 import ca.aequilibrium.weather.network.NetworkConstants;
 import ca.aequilibrium.weather.utils.ImageLoader;
 import ca.aequilibrium.weather.utils.StringUtils;
 import ca.aequilibrium.weather.viewModels.CityViewModel;
-import ca.aequilibrium.weather.viewModels.FavouritesViewModel;
 
 public class CityFragment extends Fragment {
 
@@ -40,6 +40,10 @@ public class CityFragment extends Fragment {
     private CityViewModel mCityViewModel;
 
     private CityListener mListener;
+
+    private RecyclerView mRecyclerView;
+    private ForecastAdapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     public CityFragment() {
         // Required empty public constructor
@@ -74,6 +78,10 @@ public class CityFragment extends Fragment {
             tvHeaderWinds.setText(getString(R.string.winds) + ": " + cityView.getForecast().getWind().getSpeed() + "mph");
             tvHeaderDescription.setText(StringUtils.capitalizeFirstLetter(cityView.getForecast().getWeather().get(0).getDescription()));
         }
+
+        if (cityView.getFiveDayForecast() != null) {
+            mAdapter.swapItems(cityView.getFiveDayForecast().getList());
+        }
     }
 
     @Override
@@ -91,6 +99,17 @@ public class CityFragment extends Fragment {
 
         Toolbar cityToolbar = view.findViewById(R.id.city_toolbar);
         cityToolbar.setTitle(mLocation.getName());
+
+        mRecyclerView = view.findViewById(R.id.recycler_view_fivedayforecast);
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        // specify an adapter
+        mAdapter = new ForecastAdapter(getActivity(),null);
+        mRecyclerView.setAdapter(mAdapter);
 
         return view;
     }

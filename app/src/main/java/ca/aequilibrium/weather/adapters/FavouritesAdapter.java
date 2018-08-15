@@ -44,11 +44,14 @@ public class FavouritesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public FavouritesAdapter(List<Location> favourites, FavouritesAdapterListener listener) {
-        mData = favourites;
+        mData = favourites == null ? new ArrayList<>() : favourites;
         mListener = listener;
     }
 
     public void swapItems(List<Location> newData) {
+
+        newData = newData == null ? new ArrayList<>() : newData;
+
         // compute diffs
         final LocationDiffCallback diffCallback = new LocationDiffCallback(mData, newData);
         final DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffCallback);

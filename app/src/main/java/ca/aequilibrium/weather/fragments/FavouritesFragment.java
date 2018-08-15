@@ -10,13 +10,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 
 import com.google.android.gms.maps.model.LatLng;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 
 import ca.aequilibrium.weather.AppDatabase;
 import ca.aequilibrium.weather.adapters.FavouritesAdapter;
@@ -76,33 +71,13 @@ public class FavouritesFragment extends Fragment implements FavouritesAdapter.Fa
 
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_favourites);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-//        mRecyclerView.setHasFixedSize(true);
-
         // use a linear layout manager
         mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter
-        List<Location> data = new ArrayList<>();
-        Location location = new Location();
-        location.setName("123");
-//        data.add(location);
-//        data.add("string 2");
-//        data.add("string 3");
-        mAdapter = new FavouritesAdapter(data, this);
+        mAdapter = new FavouritesAdapter(null, this);
         mRecyclerView.setAdapter(mAdapter);
-
-//        mRecyclerView.setTag(mRecyclerView.getVisibility());
-//        mRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                if (!viewHidden && mRecyclerView.getVisibility() == View.INVISIBLE || mRecyclerView.getVisibility() == View.GONE || mRecyclerView.getHeight() == 0 && mListener != null) {
-//                    mListener.onFavouritestHidden();
-//                }
-//            }
-//        });
 
         return view;
     }

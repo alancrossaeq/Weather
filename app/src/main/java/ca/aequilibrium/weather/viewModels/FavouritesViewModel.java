@@ -21,8 +21,10 @@ public class FavouritesViewModel extends ViewModel {
     public LiveData<List<Location>> getFavourites(Context context) {
         if (favourites == null) {
             favourites = new MutableLiveData<>();
-            loadFavourites(context);
         }
+
+        loadFavourites(context);
+
         return favourites;
     }
 

@@ -1,9 +1,11 @@
 package ca.aequilibrium.weather.models;
 
+import java.util.List;
+
 public class Forecast {
     private Coord coord;
     private Sys sys;
-    private Weather weather;
+    private List<Weather> weather;
     private Main main;
     private Wind wind;
     private Rain rain;
@@ -30,11 +32,11 @@ public class Forecast {
         this.sys = sys;
     }
 
-    public Weather getWeather() {
+    public List<Weather> getWeather() {
         return weather;
     }
 
-    public void setWeather(Weather weather) {
+    public void setWeather(List<Weather> weather) {
         this.weather = weather;
     }
 

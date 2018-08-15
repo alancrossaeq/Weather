@@ -23,7 +23,8 @@ public class LocationDiffCallback extends DiffUtil.Callback {
 
         boolean same = oldEntry.getLatLng().latitude == newEntry.getLatLng().latitude &&
                 oldEntry.getLatLng().longitude == newEntry.getLatLng().longitude &&
-                oldEntry.getName().equals(newEntry.getName());
+                ((oldEntry.getName() == null && newEntry.getName() == null) ||
+                        oldEntry.getName().equals(newEntry.getName()));
 
         return same;
     }

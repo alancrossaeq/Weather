@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class Rain {
     @SerializedName("3h")
-    private int threeHourVolume;
+    private Double threeHourVolume;
 
-    public int getThreeHourVolume() {
+    public Double getThreeHourVolume() {
         return threeHourVolume;
     }
 
-    public void setThreeHourVolume(int threeHourVolume) {
+    public void setThreeHourVolume(Double threeHourVolume) {
         this.threeHourVolume = threeHourVolume;
     }
 }

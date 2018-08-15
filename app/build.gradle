@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", 'WEATHER_API_ID', '"c6e381d8c7ff98f0fee43775817cf6ad"'
     }
     buildTypes {
         release {
